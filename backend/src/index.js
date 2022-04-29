@@ -9,6 +9,8 @@ const app = express();
 const PORT = process.env.PORT;
 
 app.use("/api/auth", authRoutes);
+// middleware to allow access to json body
+app.use(express.json());
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
