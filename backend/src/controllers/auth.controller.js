@@ -1,14 +1,22 @@
-import { generateToken } from "../lib/utils";
-import User from "../models/user.model";
+import { generateToken } from "../lib/utils.js";
+import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import RegexCraft from "regexcraft";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
+  const passwordValidator = new RegexCraft().hasMinLength(6);
+  const emailValidator = new RegexCraft().isEmail();
+  console.log(passwordValidator.testOne(password));
+
   try {
-    if (password.length < 6)
+    if (!passwordValidator.testOne(password).isValid)
       return res
         .status(400)
         .json({ message: "Password must be at least 6 characters" });
+
+    if (!emailValidator.testOne(email).isValid)
+      return res.status(400).json({ message: "Invalid email" });
 
     const userExists = await User.findOne({ email });
     if (userExists)
