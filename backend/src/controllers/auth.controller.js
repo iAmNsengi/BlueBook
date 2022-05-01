@@ -7,17 +7,16 @@ export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   const passwordValidator = new RegexCraft()
     .hasMinLength(8)
-    .hasUpperCase(2)
+    .hasUpperCase(1)
     .hasNumber(1)
     .hasSpecialCharacter(1);
   const emailValidator = new RegexCraft().isEmail();
-  console.log(passwordValidator.testOne(password));
 
   try {
     if (!passwordValidator.testOne(password).isValid)
       return res.status(400).json({
         message:
-          "Password must be at least 8 characters, 2 uppercase letters, 1 number and 1 special character",
+          "Password must be at least 8 characters, 1 uppercase letters,  number and 1 special character",
       });
 
     if (!emailValidator.testOne(email).isValid)
