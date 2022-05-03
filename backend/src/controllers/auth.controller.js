@@ -11,15 +11,22 @@ export const signup = async (req, res) => {
     .hasNumber(1)
     .hasSpecialCharacter(1);
   const emailValidator = new RegexCraft().isEmail();
+  const fullNameValidator = new RegexCraft().hasLetter(3).hasNoNumber();
+  console.log(fullNameValidator.testOne(fullName));
 
   try {
-    if (!passwordValidator.testOne(password).isValid)
+    if (!fullNameValidator.testOne(fullName.trim()).isValid)
+      return res
+        .status(400)
+        .json({ message: "Full name should have at least 3 characters and no numbers" });
+
+    if (!passwordValidator.testOne(password.trim()).isValid)
       return res.status(400).json({
         message:
           "Password must be at least 8 characters, 1 uppercase letters,  number and 1 special character",
       });
 
-    if (!emailValidator.testOne(email).isValid)
+    if (!emailValidator.testOne(email.trim()).isValid)
       return res.status(400).json({ message: "Invalid email" });
 
     const userExists = await User.findOne({ email });
