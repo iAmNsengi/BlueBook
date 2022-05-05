@@ -15,11 +15,9 @@ export const signup = async (req, res) => {
 
   try {
     if (!fullNameValidator.testOne(fullName.trim()).isValid)
-      return res
-        .status(400)
-        .json({
-          message: "Full name should have at least 3 characters and no numbers",
-        });
+      return res.status(400).json({
+        message: "Full name should have at least 3 characters and no numbers",
+      });
 
     if (!passwordValidator.testOne(password.trim()).isValid)
       return res.status(400).json({
@@ -58,8 +56,33 @@ export const signup = async (req, res) => {
   }
 };
 
-export const login = (req, res) => {
-  res.send("login route");
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  try {
+    const userExists = await User.findOne({ email });
+    if (!userExists)
+      return res.status(400).json({ message: "Invalid credentials" });
+    const passwordIsCorrect = await bcrypt.compare(
+      password,
+      userExists.password
+    );
+    if (!passwordIsCorrect)
+      return res.status(400).json({ message: "Invalid credentials" });
+
+    generateToken(userExists._id, res);
+
+    return res.status(200).json({
+      _id: userExists._id,
+      fullName: userExists.fullName,
+      email: userExists.email,
+      profilePic: userExists.profilePic,
+    });
+  } catch (error) {
+    console.log("An internal server error occured", error.message);
+    return res
+      .status(500)
+      .json({ message: `An internal server error occurred, ${error.message}` });
+  }
 };
 
 export const logout = (req, res) => {
