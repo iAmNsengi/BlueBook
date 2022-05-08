@@ -113,5 +113,10 @@ export const updateProfile = async (req, res) => {
       { new: true }
     );
     return res.status(200).json(updatedUser);
-  } catch (error) {}
+  } catch (error) {
+    console.log("An internal server error occurred", error.message);
+    return res
+      .status(500)
+      .json({ message: `An internal server error occurred, ${error.message}` });
+  }
 };
