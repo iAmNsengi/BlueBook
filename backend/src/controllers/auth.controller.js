@@ -120,3 +120,14 @@ export const updateProfile = async (req, res) => {
       .json({ message: `An internal server error occurred, ${error.message}` });
   }
 };
+
+export const checkAuth = (req, res) => {
+  try {
+    return res.status(200).json(req.user);
+  } catch (error) {
+    console.log("An internal server error occurred", error.message);
+    return res.status(500).json({
+      message: `An internal server error occurred, ${error.message}`,
+    });
+  }
+};
