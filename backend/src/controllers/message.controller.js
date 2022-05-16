@@ -62,7 +62,7 @@ export const sendMessage = async (req, res) => {
     await newMessage.save();
     // todo: realtime functionality to go here
 
-    return res.status(200).json(newMessage);
+    return res.status(201).json(newMessage);
   } catch (error) {
     console.log("An internal server error occured", error.message);
     return res.status(500).json({
