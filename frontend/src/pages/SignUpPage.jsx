@@ -9,6 +9,7 @@ import {
   MessageSquare,
   User,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
@@ -111,6 +112,15 @@ const SignUpPage = () => {
               )}
             </button>
           </form>
+          <div className="text-center">
+            <div className="text-base-content/60">
+              Already have an account?
+              <Link className="link link-primary" to={"/login"}>
+                {" "}
+                Sign In
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </div>
