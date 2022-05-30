@@ -10,6 +10,7 @@ import {
   User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import AuthImagePattern from "../components/AuthImagePattern";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
@@ -113,16 +114,22 @@ const SignUpPage = () => {
             </button>
           </form>
           <div className="text-center">
-            <div className="text-base-content/60">
+            <p className="text-base-content/60">
               Already have an account?
               <Link className="link link-primary" to={"/login"}>
                 {" "}
                 Sign In
               </Link>
-            </div>
+            </p>
           </div>
         </div>
       </div>
+
+      {/* right side */}
+      <AuthImagePattern
+        title="Join our community"
+        subtitle="Welcome to our community"
+      />
     </div>
   );
 };
