@@ -28,22 +28,25 @@ const SignUpPage = () => {
     const emailValidator = new RegexCraft().isEmail();
     const fullNameValidator = new RegexCraft().hasLetter(3).hasNoNumber();
 
-    if (!fullNameValidator.testOne(formData.fullName).isValid)
+    if (!fullNameValidator.testOne(formData.fullName.trim()).isValid)
       return toast.error(
         "Invalid name, you need at least 3 letters and no number."
       );
 
-    if (!emailValidator.testOne(formData.email).isValid)
+    if (!emailValidator.testOne(formData.email.trim()).isValid)
       return toast.error("Invalid email address.");
 
     if (!passwordValidator.testOne(formData.password).isValid)
       return toast.error(
         "Password must have a length of at least 8 characters, 1 uppercase, 1 number and 1 special character."
       );
+    return true;
   };
   const handleSubmit = (e) => {
     e.preventDefault();
     const success = validateForm();
+
+    if (success) signUp(formData);
   };
 
   return (
@@ -72,6 +75,7 @@ const SignUpPage = () => {
                   <User className="size-5 text-base-content/40" />
                 </div>
                 <input
+                  required
                   type="text"
                   className="input input-bordered w-full pl-14"
                   placeholder="John Doe"
@@ -90,6 +94,7 @@ const SignUpPage = () => {
                   <Mail className="size-5 text-base-content/40" />
                 </div>
                 <input
+                  required
                   type="email"
                   className="input input-bordered w-full pl-14"
                   placeholder="johndoe@mail.com"
@@ -108,6 +113,7 @@ const SignUpPage = () => {
                   <Lock className="size-5 text-base-content/40" />
                 </div>
                 <input
+                  required
                   type={showPassword ? "text" : "password"}
                   className="input input-bordered w-full pl-14"
                   placeholder="••••••••••••••••"
@@ -118,6 +124,7 @@ const SignUpPage = () => {
                 <button
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
+                  type="button"
                 >
                   {showPassword ? <EyeClosed /> : <Eye />}{" "}
                 </button>
@@ -125,12 +132,13 @@ const SignUpPage = () => {
             </div>
             <button
               type="submit"
-              className="btn btn-primary w-full"
+              className="btn btn-primary w-full animate-pulse"
               disabled={isSigningUp}
             >
               {isSigningUp ? (
                 <>
-                  <Loader2 className="size-5 animate-spin" /> Loading...
+                  <Loader2 className="size-5 animate-spin font-bold" />{" "}
+                  Submitting...
                 </>
               ) : (
                 "Create Account"
