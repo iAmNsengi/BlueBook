@@ -12,6 +12,7 @@ import { Toaster } from "react-hot-toast";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
@@ -53,7 +54,6 @@ const App = () => {
         containerClassName=""
         containerStyle={{}}
         toastOptions={{
-          // Define default options
           className: "",
           duration: 10000,
           removeDelay: 5000,
@@ -61,8 +61,6 @@ const App = () => {
             background: "#363636",
             color: "#fff",
           },
-
-          // Default options for specific types
           success: {
             duration: 3000,
             iconTheme: {
