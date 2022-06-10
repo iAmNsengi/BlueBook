@@ -35,7 +35,10 @@ const Navbar = () => {
                   <User className="size-5" />
                 </Link>
 
-                <button className="flex gap-2 items-center" onClick={logout}>
+                <button
+                  className="flex gap-2 items-center border border-red-500/40 bg-red-500/40 p-2 rounded-lg hover:bg-transparent hover:text-red-500"
+                  onClick={logout}
+                >
                   <LogOut className="size-5" />
                   <span className="hidden sm:inline">Logout</span>
                 </button>
