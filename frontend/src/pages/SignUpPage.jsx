@@ -159,8 +159,8 @@ const SignUpPage = () => {
 
       {/* right side */}
       <AuthImagePattern
-        title="Join our community"
-        subtitle="Welcome to our community"
+        title="Join Vuga community now 😎"
+        subtitle="Join to stay connected to your friends and community 👌"
       />
     </div>
   );
