@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
+  ArrowBigRight,
   Eye,
   EyeClosed,
   Loader2,
@@ -31,7 +32,9 @@ const LoginPage = () => {
               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <MessageSquare className="size-6 text-primary animate-pulse" />
               </div>
-              <h1 className="text-2xl font-bold mt-2">Welcome Back 🤗</h1>
+              <h1 className="text-2xl font-bold mt-2">
+                Welcome Back <span className="animate-pulse">🤗</span>{" "}
+              </h1>
               <p className="text-base-content/60">Login to your accout</p>
             </div>
           </div>
@@ -92,7 +95,9 @@ const LoginPage = () => {
                   Submitting...
                 </>
               ) : (
-                "Login"
+                <div className="flex items-center gap-2">
+                  Login <ArrowBigRight className="mt-1" />
+                </div>
               )}
             </button>
           </form>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
+  ArrowBigRight,
   Eye,
   EyeClosed,
   Loader2,
@@ -61,7 +62,7 @@ const SignUpPage = () => {
               </div>
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
               <p className="text-base-content/60">
-                Get started with your free account
+                Create an account to join Vuga community
               </p>
             </div>
           </div>
@@ -141,7 +142,9 @@ const SignUpPage = () => {
                   Submitting...
                 </>
               ) : (
-                "Create Account"
+                <div className="flex items-center gap-2">
+                  Create Account <ArrowBigRight className="mt-1" />
+                </div>
               )}
             </button>
           </form>
