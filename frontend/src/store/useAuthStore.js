@@ -8,6 +8,7 @@ export const useAuthStore = create((set) => ({
   isLoggingIn: false,
   isUpdatingProfile: false,
   isCheckingAuth: true,
+
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/auth/check");
@@ -56,4 +57,5 @@ export const useAuthStore = create((set) => ({
       set({ isLoggingIn: false });
     }
   },
+  updateProfile: async (data) => {},
 }));

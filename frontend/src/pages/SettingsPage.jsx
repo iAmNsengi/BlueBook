@@ -1,7 +1,9 @@
 import React from "react";
+import { useAuthStore } from "../store/useAuthStore";
 
 const SettingsPage = () => {
-  return <div className="text-white mt-20">Settings page</div>;
+  const handleImageUpload = async () => {};
+  return <div>Settings page</div>;
 };
 
 export default SettingsPage;
