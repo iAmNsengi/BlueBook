@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Loader2, User } from "lucide-react";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-  const handleInputChange = async () => {};
+  const fileRef = useRef();
+  const handleInputChange = async (e) => {
+    e.preventDefault();
+    alert("Image changed");
+    console.log(fileRef);
+  };
 
   return (
     <div className="h-full mt-20 text-white">
@@ -33,6 +38,7 @@ const ProfilePage = () => {
                 <Camera className="size-5 text-base-200" />
                 <input
                   type="file"
+                  ref={fileRef}
                   id="avatar-upload"
                   className="hidden"
                   accept="image/*"
@@ -51,6 +57,27 @@ const ProfilePage = () => {
                 "Click the camera icon to update your profile image 🌄"
               )}
             </p>
+            <div className="space-y-5 mt-5">
+              <div className="flex items-center justify-between gap-20 space-y-1 5">
+                <div className="text-sm text-zinc-400 flex items-center gap-2">
+                  <User className="size-4" />
+                  Full Name
+                </div>
+                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
+                  {authUser.fullName}{" "}
+                </p>
+              </div>
+              <div className="flex items-center justify-between gap-3 space-y-1 5">
+                <div className="text-sm text-zinc-400 flex items-center gap-2">
+                  <User className="size-4" />
+                  Email
+                </div>
+                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
+                  {authUser.email}{" "}
+                </p>
+              </div>
+              <hr />
+            </div>
           </div>
         </div>
       </div>
