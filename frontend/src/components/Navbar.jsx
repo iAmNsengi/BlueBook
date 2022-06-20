@@ -36,7 +36,7 @@ const Navbar = () => {
                 </Link>
 
                 <button
-                  className="flex gap-2 items-center border border-red-500/40 bg-red-500/40 p-2 rounded-lg hover:bg-transparent hover:text-red-500"
+                  className="flex gap-2 items-center border border-red-800 text-white bg-red-800 px-3 py-2 rounded-lg hover:bg-transparent hover:scale-90 hover:text-red-800"
                   onClick={logout}
                 >
                   <LogOut className="size-5" />

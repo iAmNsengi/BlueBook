@@ -89,7 +89,9 @@ const ProfilePage = () => {
                   </div>
                   <div className="flex items-center gap-20 justify-between py-2">
                     <span>Account Status</span>
-                    <span className="text-green-500">Active </span>
+                    <span className="bg-green-500 px-3 py-2 rounded-xl animate-pulse font-bold">
+                      Active{" "}
+                    </span>
                   </div>
                 </div>
               </div>
