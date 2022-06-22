@@ -1,14 +1,22 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Loader2, User } from "lucide-react";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const [selectedImage, setSelectedImage] = useState(null);
   const fileRef = useRef();
   const handleInputChange = async (e) => {
     e.preventDefault();
-    alert("Image changed");
-    console.log(fileRef);
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      setSelectedImage(base64Image);
+      await updateProfile({ profilePic: base64Image });
+    };
   };
 
   return (
@@ -25,7 +33,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={authUser.profilePic || "/avatar.png"}
+                src={selectedImage || authUser.profilePic || "/avatar.png"}
                 alt=""
                 className="size-32 rounded-full object-cover border-2"
               />
@@ -49,10 +57,10 @@ const ProfilePage = () => {
             </div>
             <p className="text-sm text-zinc-400">
               {isUpdatingProfile ? (
-                <>
+                <div className="flex gap-2">
                   <Loader2 className="size-5 animate-spin font-bold" />{" "}
                   Uploading...
-                </>
+                </div>
               ) : (
                 "Click the camera icon to update your profile image 🌄"
               )}
