@@ -2,7 +2,7 @@ import { create } from "zustand";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
-export const useAuthStore = create((set) => ({
+export const useAuthStore = create((set, get) => ({
   authUser: null,
   isSigningUp: false,
   isLoggingIn: false,
@@ -36,9 +36,10 @@ export const useAuthStore = create((set) => ({
   },
   logout: async () => {
     try {
+      const currentUser = get().authUser;
       await axiosInstance.post("/auth/logout");
       set({ authUser: null });
-      toast.success("Logged out successfully 👌");
+      toast.success(`Until we meet again ${currentUser.fullName} 👌`);
     } catch (error) {
       console.log("Error in logout", error);
       toast.error(error.response.data.message);
@@ -49,7 +50,7 @@ export const useAuthStore = create((set) => ({
     try {
       const res = await axiosInstance.post("/auth/login", data);
       set({ authUser: res.data });
-      toast.success("Welcome back 😊");
+      toast.success(`Welcome back ${res.data.fullName} 😊`);
     } catch (error) {
       console.log("Error in login", error);
       toast.error(error.response.data.message);
@@ -61,6 +62,7 @@ export const useAuthStore = create((set) => ({
     if (data) set({ isUpdatingProfile: true });
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
+      set({ authUser: res.data });
       toast.success("Profile picture updated successfully 👌");
     } catch (error) {
       console.error("Error in update profile", error);
