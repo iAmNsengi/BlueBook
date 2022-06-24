@@ -5,11 +5,11 @@ import { Camera, Loader2, User } from "lucide-react";
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(null);
-  const fileRef = useRef();
+
   const handleInputChange = async (e) => {
     e.preventDefault();
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file) return toast.error("No image file was selected 😒");
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async () => {
@@ -46,7 +46,6 @@ const ProfilePage = () => {
                 <Camera className="size-5 text-base-200" />
                 <input
                   type="file"
-                  ref={fileRef}
                   id="avatar-upload"
                   className="hidden"
                   accept="image/*"
@@ -62,11 +61,14 @@ const ProfilePage = () => {
                   Uploading...
                 </div>
               ) : (
-                "Click the camera icon to update your profile image 🌄"
+                <p className="border border-primary rounded-xl px-6 py-1 animate-pulse">
+                  {" "}
+                  Click the camera icon to update your profile image 🌄
+                </p>
               )}
             </p>
             <div className="space-y-5 py-10 pointer-events-none">
-              <div className="flex items-center justify-between gap-20 space-y-1 5">
+              <div className="flex items-center justify-between gap-40 space-y-1 5">
                 <div className="text-sm text-zinc-400 flex items-center gap-2">
                   <User className="size-4" />
                   Full Name
