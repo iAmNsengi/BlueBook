@@ -13,6 +13,7 @@ import { useThemeStore } from "./store/useThemeStore";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+  const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
@@ -24,8 +25,6 @@ const App = () => {
         <Loader className="size-10 animate-spin" />
       </div>
     );
-
-  const { theme } = useThemeStore();
 
   return (
     <div data-theme={theme}>
