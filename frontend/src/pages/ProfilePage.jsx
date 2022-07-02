@@ -9,7 +9,8 @@ const ProfilePage = () => {
   const handleInputChange = async (e) => {
     e.preventDefault();
     const file = e.target.files[0];
-    if (!file) return toast.error("No image file was selected 😒");
+    if (!file)
+      return toast.error("An unexpected error happened, try again later! 😒");
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = async () => {
@@ -61,10 +62,9 @@ const ProfilePage = () => {
                   Uploading...
                 </div>
               ) : (
-                <p className="border border-primary rounded-xl px-6 py-1 animate-pulse">
-                  {" "}
+                <h4 className="border border-primary rounded-xl px-6 py-1 animate-pulse">
                   Click the camera icon to update your profile image 🌄
-                </p>
+                </h4>
               )}
             </p>
             <div className="space-y-5 py-10 pointer-events-none">
