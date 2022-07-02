@@ -25,8 +25,8 @@ export const isLoggedIn = async (req, res, next) => {
       "An internal server error occurred in isLoggedIn middleware",
       error.message
     );
-    return res
-      .status(500)
-      .json({ message: `An internal server error occurred, ${error.message}` });
+    return res.status(500).json({
+      message: `An internal server error occurred in isLogin, ${error.message}`,
+    });
   }
 };

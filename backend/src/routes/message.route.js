@@ -8,7 +8,7 @@ import {
 
 const router = express.Router();
 
-router.get("/user", isLoggedIn, getUsersForSidebar);
+router.get("/users", isLoggedIn, getUsersForSidebar);
 router.get("/:id", isLoggedIn, getMessages);
 
 router.get("/send/:id", isLoggedIn, sendMessage);
