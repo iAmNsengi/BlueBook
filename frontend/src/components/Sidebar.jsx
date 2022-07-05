@@ -4,9 +4,15 @@ import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import { Users } from "lucide-react";
 
 const Sidebar = () => {
-  const { users, getUsers, selectedUser, setSelectedUser, isUsersLoading } =
-    useChatStore();
-  const onlineUsers = [];
+  const {
+    users,
+    getUsers,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+    onlineUsers,
+  } = useChatStore();
+
   useEffect(() => {
     getUsers();
   }, [getUsers]);
