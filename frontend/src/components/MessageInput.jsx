@@ -1,18 +1,20 @@
 import React, { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { X } from "lucide-react";
+import { Image, Send, X } from "lucide-react";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
-  const inputRef = useRef(null);
+  const fileInputRef = useRef(null);
   const { sendMessage } = useChatStore();
 
   const handleImageChange = (e) => {
     e.preventDefault();
   };
   const removeImage = () => {};
-  const handleMessage = async (e) => {};
+  const handleSendMessage = async (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div className="p-4 w-full">
@@ -34,6 +36,45 @@ const MessageInput = () => {
           </div>
         </div>
       )}
+
+      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+        {" "}
+        <div className="flex-1 flex gap-2">
+          <input
+            type="text"
+            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            placeholder="Type a message..."
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            ref={fileInputRef}
+            onChange={handleImageChange}
+          />
+          <button
+            type="button"
+            className={`hidden sm:flex btn btn-circle ${
+              imagePreview ? "text-emerald-500" : "text-zinc-400"
+            }`}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Image size={20} />
+          </button>
+        </div>
+        <button
+          className={`items-center bg-zinc-400 p-2 rounded-full ${
+            !text.trim() && !imagePreview
+              ? "cursor-not-allowed "
+              : "cursor-pointer bg-green-600"
+          }`}
+          disabled={!text.trim() && !imagePreview}
+        >
+          <Send className="mx-auto" />
+        </button>
+      </form>
     </div>
   );
 };
