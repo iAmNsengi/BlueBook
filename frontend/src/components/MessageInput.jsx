@@ -1,6 +1,7 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { Image, Send, X } from "lucide-react";
+import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
@@ -10,8 +11,18 @@ const MessageInput = () => {
 
   const handleImageChange = (e) => {
     e.preventDefault();
+    const file = e.target.files[0];
+    if (!file.type.startsWith("image/"))
+      return toast.error("Please select an image file");
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setImagePreview(reader.result);
+    };
+    reader.readAsDataURL(file);
   };
   const removeImage = () => {};
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
   };
@@ -65,7 +76,7 @@ const MessageInput = () => {
           </button>
         </div>
         <button
-          className={`items-center bg-zinc-400 p-2 rounded-full ${
+          className={`items-center bg-base-300 p-3 rounded-full flex hover:bg-green-700 ${
             !text.trim() && !imagePreview
               ? "cursor-not-allowed "
               : "cursor-pointer bg-green-600"
