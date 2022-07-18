@@ -21,10 +21,25 @@ const MessageInput = () => {
     };
     reader.readAsDataURL(file);
   };
-  const removeImage = () => {};
+
+  const removeImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    if (!text.trim() && !imagePreview) return;
+    try {
+      await sendMessage({ text: text.trim(), image: imagePreview });
+      // clear the form
+      setText("");
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (error) {
+      console.error("Failed to send the message: ", error);
+      toast.error(error.message);
+    }
   };
 
   return (
