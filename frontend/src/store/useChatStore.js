@@ -8,6 +8,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessageLoading: false,
+  isSendingMessage: false,
 
   getUsers: async () => {
     set({ isUsersLoading: true });
@@ -35,6 +36,7 @@ export const useChatStore = create((set, get) => ({
     }
   },
   sendMessage: async (messageData) => {
+    set({ isSendingMessage: true });
     try {
       const { selectedUser, messages } = get();
 
@@ -47,6 +49,8 @@ export const useChatStore = create((set, get) => ({
     } catch (error) {
       console.error("Error in sendMessage", error);
       toast.error(error.response.data.message);
+    } finally {
+      set({ isSendingMessage: false });
     }
   },
 
