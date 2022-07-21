@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import {
   ArrowBigRight,
@@ -103,7 +103,7 @@ const LoginPage = () => {
           </form>
           <div className="text-center">
             <p className="text-base-content/60">
-              Don't have an account?
+              Don&apos;t have an account?
               <Link className="link link-primary" to={"/signup"}>
                 {" "}
                 Sign Up
