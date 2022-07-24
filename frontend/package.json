@@ -19,6 +19,7 @@
     "react-hot-toast": "^2.5.1",
     "react-router-dom": "^7.1.1",
     "regexcraft": "^1.0.20",
+    "socket.io-client": "^4.8.1",
     "zustand": "^5.0.3"
   },
   "devDependencies": {
