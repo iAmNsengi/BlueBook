@@ -7,13 +7,22 @@ import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
 
 const ChatContainer = () => {
-  const { messages, getMessages, isMessagesLoading, selectedUser } =
-    useChatStore();
+  const {
+    messages,
+    getMessages,
+    isMessagesLoading,
+    selectedUser,
+    subscribeToMessages,
+    unSubscribeFromMessages,
+  } = useChatStore();
   const { authUser } = useAuthStore();
 
   useEffect(() => {
     getMessages(selectedUser._id);
-  }, [selectedUser, getMessages]);
+    subscribeToMessages();
+
+    return () => unSubscribeFromMessages();
+  }, [selectedUser, getMessages, subscribeToMessages, unSubscribeFromMessages]);
   if (isMessagesLoading)
     return (
       <div className="flex-1 flex flex-col overflow-auto">
