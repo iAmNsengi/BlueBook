@@ -1,3 +1,5 @@
+import PropTypes from "prop-types";
+
 const AuthImagePattern = ({ title, subtitle }) => {
   return (
     <div className="hidden lg:flex items-center justify-center bg-primary/10 p-12">
@@ -17,6 +19,10 @@ const AuthImagePattern = ({ title, subtitle }) => {
       </div>
     </div>
   );
+};
+AuthImagePattern.propTypes = {
+  title: PropTypes.string.isRequired,
+  subtitle: PropTypes.string,
 };
 
 export default AuthImagePattern;
