@@ -52,7 +52,7 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isSendingMessage: false });
-    }
+    } 
   },
   subscribeToMessages: () => {
     const { selectedUser } = get();
@@ -60,6 +60,7 @@ export const useChatStore = create((set, get) => ({
     if (!selectedUser) return;
 
     socket.on("newMessage", (newMessage) => {
+      if (newMessage.senderId !== selectedUser._id) return;
       set({ messages: [...get().messages, newMessage] });
     });
   },
