@@ -20,8 +20,9 @@
     "react-router-dom": "^7.1.1",
     "regexcraft": "^1.0.20",
     "socket.io-client": "^4.8.1",
-    "zustand": "^5.0.3",
-    "vite": "^6.0.5"
+    "vite": "^6.0.5",
+    "vuga-chat-app": "file:..",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
