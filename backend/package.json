@@ -21,7 +21,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "regexcraft": "^1.0.20",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "vuga-chat-app": "file:.."
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
