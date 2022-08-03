@@ -33,6 +33,8 @@ app.use("/api/messages", messageRoutes);
 //   });
 // }
 
+app.options("*", cors()); // Enable pre-flight across-the-board
+
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
   connectDB();
