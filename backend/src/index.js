@@ -11,15 +11,26 @@ dotenv.config();
 
 const PORT = process.env.PORT;
 
-app.use(express.json());
-app.use(cookieParser());
+const allowedOrigins = ["http://localhost:5173", "https://vuga.onrender.com"];
+
+// CORS configuration
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://vuga.onrender.com"],
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Cookie", "Set-Cookie", "Authorization"],
   })
 );
 
+app.use(express.json());
+app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
