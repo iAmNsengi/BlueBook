@@ -4,9 +4,6 @@ import User from "../models/user.model.js";
 export const isLoggedIn = async (req, res, next) => {
   try {
     const token = req.cookies.jwt;
-    console.log(token, "token ----------");
-    console.log(req.cookies, "req.cookies---------");
-
     if (!token)
       return res
         .status(401)
