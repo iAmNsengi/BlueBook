@@ -40,8 +40,10 @@ export const signup = async (req, res) => {
     const newUser = new User({ fullName, email, password: hashedPassword });
 
     if (newUser) {
-      generateToken(newUser._id, res);
       await newUser.save();
+
+      generateToken(newUser._id, res);
+      
       return res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
@@ -58,43 +60,58 @@ export const signup = async (req, res) => {
 };
 
 export const login = async (req, res) => {
-  const { email, password } = req.body;
   try {
-    const userExists = await User.findOne({ email });
-    if (!userExists)
-      return res.status(400).json({ message: "Invalid credentials" });
-    const passwordIsCorrect = await bcrypt.compare(
-      password,
-      userExists.password
-    );
-    if (!passwordIsCorrect)
-      return res.status(400).json({ message: "Invalid credentials" });
+    const { email, password } = req.body;
 
-    generateToken(userExists._id, res);
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+    if (!passwordIsCorrect) {
+      return res.status(400).json({ message: "Invalid credentials" });
+    }
+
+    // Clear any existing cookies first
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com",
+      path: "/",
+    });
+
+    // Generate new token
+    generateToken(user._id, res);
 
     return res.status(200).json({
-      _id: userExists._id,
-      fullName: userExists.fullName,
-      email: userExists.email,
-      profilePic: userExists.profilePic,
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
     });
   } catch (error) {
-    console.log("An internal server error occured", error.message);
-    return res
-      .status(500)
-      .json({ message: `An internal server error occurred, ${error.message}` });
+    console.log("Error in login controller:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
 export const logout = (req, res) => {
   try {
-    res.cookie("jwt", "", { maxAge: 0 });
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV !== "development",
+      sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
+      domain:
+        process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com",
+      path: "/",
+    });
     return res.status(200).json({ message: "Logged out successfully!" });
   } catch (error) {
-    console.log("An internal server occured", error.message);
-    return res
-      .status(500)
-      .json({ message: `An internal server occured ${error.message}` });
+    console.log("Error in logout controller:", error.message);
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
