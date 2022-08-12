@@ -13,6 +13,9 @@ const PORT = process.env.PORT;
 
 const allowedOrigins = ["http://localhost:5173", "https://vuga.onrender.com"];
 
+app.use(express.json());
+app.use(cookieParser());
+
 // CORS configuration
 app.use(
   cors({
@@ -29,8 +32,6 @@ app.use(
   })
 );
 
-app.use(express.json());
-// app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
 
