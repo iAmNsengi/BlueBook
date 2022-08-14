@@ -35,7 +35,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
-      toast.success("Account created successfully!");
+      if (res?.data) toast.success("Account created successfully!");
       get().connectSocket();
     } catch (error) {
       console.log("An internal server error occurred ", error);
@@ -60,10 +60,8 @@ export const useAuthStore = create((set, get) => ({
     if (data) set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      console.log(res);
-
       set({ authUser: res.data });
-      toast.success(`Welcome back ${res.data.fullName} 😊`);
+      if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
       get().connectSocket();
     } catch (error) {
       console.log("Error in login", error);

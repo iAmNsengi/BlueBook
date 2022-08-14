@@ -43,7 +43,7 @@ export const signup = async (req, res) => {
       await newUser.save();
 
       generateToken(newUser._id, res);
-      
+
       return res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
@@ -78,9 +78,8 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
       sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com",
       path: "/",
+      ...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
     });
 
     // Generate new token
@@ -104,9 +103,8 @@ export const logout = (req, res) => {
       httpOnly: true,
       secure: process.env.NODE_ENV !== "development",
       sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com",
       path: "/",
+      ...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
     });
     return res.status(200).json({ message: "Logged out successfully!" });
   } catch (error) {

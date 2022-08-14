@@ -38,7 +38,7 @@ export const isLoggedIn = async (req, res, next) => {
       });
     }
 
-    const user = await User.findById(decoded.userId).select("-password").lean(); // Use lean() for better performance
+    const user = await User.findById(decoded.userId).select("-password").lean();
 
     if (!user) {
       // Clear cookie if user not found

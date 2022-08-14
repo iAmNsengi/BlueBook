@@ -11,11 +11,12 @@ export const generateToken = (userId, res) => {
     httpOnly: true, // prevent XSS attacks
     sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
     secure: process.env.NODE_ENV !== "development",
-    domain:
-      process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com", // Allow sharing across subdomains
+    // Remove domain setting in production
+    ...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
+
     path: "/", // Ensuring cookie is available across all paths
   };
 
-   res.cookie("jwt", token, cookieOptions);
+  res.cookie("jwt", token, cookieOptions);
   return token;
 };
