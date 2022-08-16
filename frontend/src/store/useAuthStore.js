@@ -59,17 +59,24 @@ export const useAuthStore = create((set, get) => ({
   login: async (data) => {
     if (data) set({ isLoggingIn: true });
     try {
+      set({ authUser: null });
       const res = await axiosInstance.post("/auth/login", data);
+      if (!res?.data?._id) {
+        throw new Error("Invalid response from server");
+      }
       set({ authUser: res.data });
       if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
+      await get().checkAuth();
       get().connectSocket();
     } catch (error) {
       console.log("Error in login", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Login failed");
+      set({ authUser: null });
     } finally {
       set({ isLoggingIn: false });
     }
   },
+
   updateProfile: async (data) => {
     if (data) set({ isUpdatingProfile: true });
     try {
