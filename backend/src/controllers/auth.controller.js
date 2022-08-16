@@ -73,17 +73,16 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    // Clear any existing cookies first
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-      path: "/",
-      ...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
-    });
+    const token = generateToken(user._id, res);
+    console.log("token--------", token);
 
-    // Generate new token
-    generateToken(user._id, res);
+    // Verify the cookie was set
+    if (!res.getHeader("Set-Cookie")) {
+      console.log("Warning: Cookie not set during login");
+      return res
+        .status(500)
+        .json({ message: "Failed to set authentication token" });
+    }
 
     return res.status(200).json({
       _id: user._id,
