@@ -61,12 +61,11 @@ export const useAuthStore = create((set, get) => ({
     try {
       set({ authUser: null });
       const res = await axiosInstance.post("/auth/login", data);
-      if (!res?.data?._id) {
-        throw new Error("Invalid response from server");
-      }
+      if (!res?.data?._id) return toast.error("Invalid response from server");
+      
       set({ authUser: res.data });
-      if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
       await get().checkAuth();
+      if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
       get().connectSocket();
     } catch (error) {
       console.log("Error in login", error);
