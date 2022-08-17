@@ -35,6 +35,7 @@ export const useAuthStore = create((set, get) => ({
     try {
       const res = await axiosInstance.post("/auth/signup", data);
       set({ authUser: res.data });
+      await get().checkAuth()
       if (res?.data) toast.success("Account created successfully!");
       get().connectSocket();
     } catch (error) {
@@ -44,6 +45,7 @@ export const useAuthStore = create((set, get) => ({
       set({ isSigningUp: false });
     }
   },
+
   logout: async () => {
     try {
       const currentUser = get().authUser;
@@ -56,13 +58,14 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     }
   },
+
   login: async (data) => {
     if (data) set({ isLoggingIn: true });
     try {
       set({ authUser: null });
       const res = await axiosInstance.post("/auth/login", data);
       if (!res?.data?._id) return toast.error("Invalid response from server");
-      
+
       set({ authUser: res.data });
       await get().checkAuth();
       if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
