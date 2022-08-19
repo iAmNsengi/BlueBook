@@ -24,6 +24,8 @@ export const generateToken = (userId, res) => {
 
     // Verify cookie was set
     const cookies = res.getHeader("Set-Cookie");
+    console.log(cookies);
+
     if (!cookies) {
       console.log("Warning: Cookie header not set after res.cookie()");
     } else {
