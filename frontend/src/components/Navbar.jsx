@@ -38,7 +38,7 @@ const Navbar = () => {
               <>
                 <Link to={"/chat"} className="btn btn-sm gap-2">
                   <MessageCircle className="size-5" />
-                  Chat
+                  Chats
                 </Link>
                 <Link to={"/profile"} className="btn btn-sm gap-2">
                   <User className="size-5" />

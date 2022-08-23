@@ -1,8 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import HomePage from "./pages/HomePage";
-import SignUpPage from "./pages/SignUpPage";
-import LoginPage from "./pages/LoginPage";
+import SignUpPage from "./pages/auth/SignUpPage";
+import LoginPage from "./pages/auth/LoginPage";
 import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
@@ -35,10 +35,7 @@ const App = () => {
           path="/"
           element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
         />
-        <Route
-          path="/chat"
-          element={authUser ? <Chat /> : <SignUpPage />}
-        />
+        <Route path="/chat" element={authUser ? <Chat /> : <SignUpPage />} />
         <Route
           path="/signup"
           element={authUser ? <Navigate to={"/"} /> : <SignUpPage />}
