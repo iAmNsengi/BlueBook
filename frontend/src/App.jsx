@@ -10,6 +10,7 @@ import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { useThemeStore } from "./store/useThemeStore";
+import Chat from "./pages/chat/Chat";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -33,6 +34,10 @@ const App = () => {
         <Route
           path="/"
           element={authUser ? <HomePage /> : <Navigate to={"/login"} />}
+        />
+        <Route
+          path="/chat"
+          element={authUser ? <Chat /> : <SignUpPage />}
         />
         <Route
           path="/signup"

@@ -1,6 +1,12 @@
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
-import { LogOut, MessagesSquare, Settings, User } from "lucide-react";
+import {
+  LogOut,
+  MessageCircle,
+  MessagesSquare,
+  Settings,
+  User,
+} from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 
 const Navbar = () => {
@@ -28,6 +34,17 @@ const Navbar = () => {
             </Link>
           </div>
           <div className="flex items-center gap-2">
+            {authUser && (
+              <>
+                <Link to={"/chat"} className="btn btn-sm gap-2">
+                  <MessageCircle className="size-5" />
+                  Chat
+                </Link>
+                <Link to={"/profile"} className="btn btn-sm gap-2">
+                  <User className="size-5" />
+                </Link>
+              </>
+            )}
             <Link
               to={"/settings"}
               className="btn btn-sm gap-2 transition-colors"
@@ -36,19 +53,13 @@ const Navbar = () => {
               <span className="hidden sm:inline">Settings</span>
             </Link>
             {authUser && (
-              <>
-                <Link to={"/profile"} className="btn btn-sm gap-2">
-                  <User className="size-5" />
-                </Link>
-
-                <button
-                  className="flex gap-2 items-center border border-red-800 text-white bg-red-800 px-3 py-2 rounded-lg hover:bg-transparent hover:scale-90 hover:text-red-800"
-                  onClick={logoutUser}
-                >
-                  <LogOut className="size-5" />
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
-              </>
+              <button
+                className="flex gap-2 items-center border border-red-800 text-white bg-red-800 px-3 py-2 rounded-lg hover:bg-transparent hover:scale-90 hover:text-red-800"
+                onClick={logoutUser}
+              >
+                <LogOut className="size-5" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
             )}
           </div>
         </div>
