@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Loader2, User } from "lucide-react";
+import toast from "react-hot-toast";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
@@ -62,9 +63,9 @@ const ProfilePage = () => {
                   Uploading...
                 </div>
               ) : (
-                <h4 className="border border-primary rounded-xl px-6 py-1 animate-pulse">
+                <span className="border border-primary rounded-xl px-6 py-1 animate-pulse">
                   Click the camera icon to update your profile image 🌄
-                </h4>
+                </span>
               )}
             </p>
             <div className="space-y-5 py-10 pointer-events-none">
