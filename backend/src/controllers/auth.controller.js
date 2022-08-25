@@ -132,6 +132,21 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const deletedUser = await User.findByIdAndDelete(userId);
+    console.log(deleteAccount);
+
+    return res.status(200).json({ message: "User deleted successfully!" });
+  } catch (error) {
+    console.error("An error occurred in deleteAccount", error);
+    return res
+      .status(500)
+      .json({ message: `An internal server error occurred, ${error.message}` });
+  }
+};
+
 export const checkAuth = (req, res) => {
   try {
     return res.status(200).json(req.user);
