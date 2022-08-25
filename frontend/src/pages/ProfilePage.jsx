@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(null);
+  const [enableDelete, setEnableDelete] = useState(false);
 
   const handleInputChange = async (e) => {
     e.preventDefault();
@@ -19,6 +20,11 @@ const ProfilePage = () => {
       setSelectedImage(base64Image);
       await updateProfile({ profilePic: base64Image });
     };
+  };
+
+  const deleteAccount = async (e) => {
+    e.preventDefault();
+    alert("Account deleted");
   };
 
   return (
@@ -105,6 +111,42 @@ const ProfilePage = () => {
                     </span>
                   </div>
                 </div>
+              </div>
+            </div>
+            <div className="space-y-2 w-full mt-4  px-2">
+              <div className="space-y-3">
+                <h2 className="text-xl font-bold text-red-600">
+                  Delete Account 🚫
+                </h2>
+                <form
+                  className="flex items-end justify-between py-2 border-zinc-700"
+                  onSubmit={deleteAccount}
+                >
+                  <div className="flex flex-col">
+                    <span className="flex items-center gap-4 py-2">
+                      Type in{" "}
+                      <span className="font-bold">sudo delete account</span> to
+                      remove your account
+                    </span>
+                    <input
+                      className="input"
+                      type="text"
+                      placeholder="sudo delete account"
+                      onChange={(e) =>
+                        e.target.value === "sudo delete account"
+                          ? setEnableDelete(true)
+                          : setEnableDelete(false)
+                      }
+                    />
+                  </div>
+
+                  <button
+                    disabled={!enableDelete}
+                    className={`btn bg-red-600 rounded-lg text-white cursor-pointer z-50`}
+                  >
+                    Delete Account
+                  </button>
+                </form>
               </div>
             </div>
           </div>
