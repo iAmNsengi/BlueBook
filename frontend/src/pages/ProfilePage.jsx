@@ -4,7 +4,13 @@ import { Camera, Loader2, User } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
-  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const {
+    authUser,
+    isUpdatingProfile,
+    updateProfile,
+    isDeletingAccount,
+    deleteAccount,
+  } = useAuthStore();
   const [selectedImage, setSelectedImage] = useState(null);
   const [enableDelete, setEnableDelete] = useState(false);
 
@@ -22,9 +28,9 @@ const ProfilePage = () => {
     };
   };
 
-  const deleteAccount = async (e) => {
+  const deleteMyAccount = async (e) => {
     e.preventDefault();
-    alert("Account deleted");
+    await deleteAccount();
   };
 
   return (
@@ -120,7 +126,7 @@ const ProfilePage = () => {
                 </h2>
                 <form
                   className="flex items-end justify-between py-2 border-zinc-700"
-                  onSubmit={deleteAccount}
+                  onSubmit={deleteMyAccount}
                 >
                   <div className="flex flex-col">
                     <span className="flex items-center gap-4 py-2">
@@ -144,7 +150,13 @@ const ProfilePage = () => {
                     disabled={!enableDelete}
                     className={`btn bg-red-600 rounded-lg text-white cursor-pointer z-50`}
                   >
-                    Delete Account
+                    {isDeletingAccount ? (
+                      <>
+                        <Loader2 className="size-5 animate-spin font-bold" />{" "}
+                      </>
+                    ) : (
+                      "Delete Account"
+                    )}
                   </button>
                 </form>
               </div>
