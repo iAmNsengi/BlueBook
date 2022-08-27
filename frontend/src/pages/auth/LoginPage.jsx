@@ -77,7 +77,11 @@ const LoginPage = () => {
                 />
                 <button
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() =>
+                    formData.password !== ""
+                      ? setShowPassword(!showPassword)
+                      : undefined
+                  }
                   type="button"
                 >
                   {showPassword ? <EyeClosed /> : <Eye />}{" "}
