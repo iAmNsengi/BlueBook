@@ -41,6 +41,12 @@ const SignUpPage = () => {
       return toast.error(
         "Password must have a length of at least 8 characters, 1 uppercase, 1 number and 1 special character."
       );
+
+    if (formData.password !== formData.password2) {
+      toast.error("Passwords don't match");
+      return false;
+    }
+
     return true;
   };
   const handleSubmit = (e) => {
@@ -131,9 +137,35 @@ const SignUpPage = () => {
                 </button>
               </div>
             </div>
+            <div className="form-control">
+              <label className="lavel">
+                <span className="label-text font-medium">Re-Type Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  required
+                  type={showPassword ? "text" : "password"}
+                  className="input input-bordered w-full pl-14"
+                  placeholder="••••••••••••••••"
+                  onChange={(e) =>
+                    setFormData({ ...formData, password2: e.target.value })
+                  }
+                />
+                <button
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                  type="button"
+                >
+                  {showPassword ? <EyeClosed /> : <Eye />}{" "}
+                </button>
+              </div>
+            </div>
             <button
               type="submit"
-              className="btn btn-primary w-full animate-pulse"
+              className="btn btn-primary w-full"
               disabled={isSigningUp}
             >
               {isSigningUp ? (
