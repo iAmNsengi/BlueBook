@@ -7,9 +7,31 @@ export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id;
 
-    const filteredUsers = await User.find({
-      _id: { $ne: loggedInUserId },
-    }).select("-password");
+    const conversations = await Message.find({
+      $or: [
+        {
+          senderId: loggedInUserId,
+        },
+        {
+          receiverId: loggedInUserId,
+        },
+      ],
+    })
+      .sort("createdAt")
+      .select("senderId receiverId");
+
+    const userIds = [
+      ...new Set(
+        conversations.flatMap((convo) => [
+          convo.senderId.toString(),
+          convo.receiverId.toString(),
+        ])
+      ),
+    ].filter((id) => id !== loggedInUserId.toString());
+
+    const filteredUsers = await Promise.all(
+      userIds.map(async (el) => await User.findById(el).select("-password"))
+    );
 
     return res.status(200).json(filteredUsers);
   } catch (error) {
