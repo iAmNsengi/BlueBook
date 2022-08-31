@@ -17,7 +17,7 @@ export const getUsersForSidebar = async (req, res) => {
         },
       ],
     })
-      .sort("createdAt")
+      .sort("-createdAt")
       .select("senderId receiverId");
 
     const userIds = [
