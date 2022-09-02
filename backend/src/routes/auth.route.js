@@ -2,6 +2,7 @@ import express from "express";
 import {
   checkAuth,
   deleteAccount,
+  findUsers,
   login,
   logout,
   signup,
@@ -16,6 +17,8 @@ router.post("/login", login);
 router.post("/logout", logout);
 router.put("/update-profile", isLoggedIn, updateProfile);
 router.delete("/delete-account", isLoggedIn, deleteAccount);
+
+router.post("/findUsers", isLoggedIn, findUsers);
 
 router.get("/check", isLoggedIn, checkAuth);
 

@@ -8,6 +8,7 @@ export const useChatStore = create((set, get) => ({
   users: [],
   selectedUser: null,
   isUsersLoading: false,
+  isSearchingUsers: false,
   isMessageLoading: false,
   isSendingMessage: false,
 
@@ -52,7 +53,23 @@ export const useChatStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isSendingMessage: false });
-    } 
+    }
+  },
+  searchUsers: async (query) => {
+    set({ isSearchingUsers: false });
+    console.log(query);
+
+    try {
+      const res = await axiosInstance.post("/auth/findUsers", {
+        search: query,
+      });
+      set({ users: res.data });
+    } catch (error) {
+      console.error("Error in sendMessage", error);
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isSearchingUsers: false });
+    }
   },
   subscribeToMessages: () => {
     const { selectedUser } = get();

@@ -3,6 +3,7 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import RegexCraft from "regexcraft";
 import cloudinary from "../lib/cloudinary.js";
+import { isLoggedIn } from "../middlewares/auth.middleware.js";
 
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
@@ -129,6 +130,24 @@ export const updateProfile = async (req, res) => {
     return res
       .status(500)
       .json({ message: `An internal server error occurred, ${error.message}` });
+  }
+};
+
+export const findUsers = async (req, res) => {
+  try {
+    const { search } = req.body;
+    const { user } = req;
+
+    const users = await User.find({
+      fullName: { $regex: search, $options: "i" },
+      _id: { $ne: user._id },
+    });
+    return res.status(200).json(users);
+  } catch (error) {
+    console.error("Error in findusers", error);
+    return res
+      .status(500)
+      .json({ message: `Error in findUsers, ${error.message}` });
   }
 };
 
