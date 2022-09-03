@@ -90,7 +90,7 @@ const Sidebar = () => {
             </div>
 
             <div className="hidden lg:block text-left min-w-0">
-              <div className="font-medium truncate">{user.fullName} </div>
+              <div className="font-medium truncate">{user?.fullName} </div>
               <div className="text-xs text-zinc-400">
                 {onlineUsers.includes(user?._id) ? (
                   <span className="text-green-600">Online</span>
@@ -101,8 +101,15 @@ const Sidebar = () => {
             </div>
           </button>
         ))}
-        {filteredUsers.length === 0 && (
+
+        {users.length === 0 ? (
           <div className="text-center text-zinc-500 py-4">No online users</div>
+        ) : (
+          filteredUsers.length === 0 && (
+            <div className="text-center text-zinc-500 py-4">
+              No online users
+            </div>
+          )
         )}
       </div>
     </aside>
