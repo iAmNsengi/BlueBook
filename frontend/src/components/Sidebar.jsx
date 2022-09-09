@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Search, Users } from "lucide-react";
+import { Loader2, Search, Users } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Sidebar = () => {
@@ -11,6 +11,7 @@ const Sidebar = () => {
     selectedUser,
     setSelectedUser,
     isUsersLoading,
+    isSearchingUsers,
     searchUsers,
   } = useChatStore();
   const { onlineUsers } = useAuthStore();
@@ -27,6 +28,7 @@ const Sidebar = () => {
 
   const searchForUsers = (e) => {
     e.preventDefault();
+    if (searchedUser.trim() === "") return;
     searchUsers(searchedUser);
   };
 
@@ -52,18 +54,27 @@ const Sidebar = () => {
         </span>
       </div>
       <form
-        className="mt-3 px-3 hidden lg:flex items-center border"
+        className="mt-3 w-full justify-between outline-none hidden lg:flex items-center border"
         onSubmit={searchForUsers}
       >
         <input
           type="text"
-          checked={showOnlineOnly}
-          className="input input-bordered "
+          disabled={isSearchingUsers}
+          className="input outline-none w-full "
           placeholder="Search for users..."
-          onChange={(e) => setSearchedUser(e.target.value)}
+          onChange={(e) => {
+            setSearchedUser(e.target.value);
+            if (e.target.value === "") getUsers();
+          }}
         />
         <button className="btn btn-primary">
-          <Search />
+          {isSearchingUsers ? (
+            <>
+              <Loader2 className="size-5 animate-spin font-bold" />
+            </>
+          ) : (
+            <Search />
+          )}
         </button>
       </form>
 
