@@ -53,6 +53,7 @@ const ChatContainer = () => {
             }`}
             ref={messageEndRef}
           >
+            
             <div className="chat-image avatar">
               <div className="size-10 rounded-full border">
                 <img
@@ -63,7 +64,6 @@ const ChatContainer = () => {
                   }
                   alt={"profile pic"}
                 />
-                {console.log(message.senderId, authUser?._id)}
               </div>
             </div>
             <div className="chat-header mb-1">
