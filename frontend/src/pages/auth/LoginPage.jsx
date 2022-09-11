@@ -93,7 +93,7 @@ const LoginPage = () => {
             </div>
             <button
               type="submit"
-              className="btn btn-primary w-full animate-pulse"
+              className="btn btn-primary w-full"
               disabled={isLoggingIn}
             >
               {isLoggingIn ? (
