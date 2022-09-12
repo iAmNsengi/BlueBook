@@ -7,6 +7,7 @@ import SidebarTop from "./SidebarTop";
 const Sidebar = () => {
   const { users, getUsers, selectedUser, setSelectedUser, searchUsers } =
     useChatStore();
+  const { authUser } = useAuthStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchedUser, setSearchedUser] = useState(null);
@@ -15,9 +16,11 @@ const Sidebar = () => {
     getUsers();
   }, [getUsers]);
 
-  let filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user?._id))
-    : users;
+  const myOnlineUsers = users.filter((user) => onlineUsers.includes(user?._id));
+
+  console.log(authUser._id, myOnlineUsers);
+
+  let filteredUsers = showOnlineOnly ? myOnlineUsers : users;
 
   const searchForUsers = (e) => {
     e.preventDefault();
@@ -30,7 +33,7 @@ const Sidebar = () => {
       <SidebarTop
         showOnlineOnly={showOnlineOnly}
         setShowOnlineOnly={setShowOnlineOnly}
-        onlineUsers={onlineUsers}
+        onlineUsers={myOnlineUsers}
       />
 
       <SearchForm
