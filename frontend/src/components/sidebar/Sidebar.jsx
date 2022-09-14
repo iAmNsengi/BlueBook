@@ -7,7 +7,6 @@ import SidebarTop from "./SidebarTop";
 const Sidebar = () => {
   const { users, getUsers, selectedUser, setSelectedUser, searchUsers } =
     useChatStore();
-  const { authUser } = useAuthStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchedUser, setSearchedUser] = useState(null);
@@ -18,9 +17,7 @@ const Sidebar = () => {
 
   const myOnlineUsers = users.filter((user) => onlineUsers.includes(user?._id));
 
-  console.log(authUser._id, myOnlineUsers);
-
-  let filteredUsers = showOnlineOnly ? myOnlineUsers : users;
+  const filteredUsers = showOnlineOnly ? myOnlineUsers : users;
 
   const searchForUsers = (e) => {
     e.preventDefault();

@@ -36,5 +36,4 @@ SearchForm.propTypes = {
   searchForUsers: PropTypes.func.isRequired,
   setSearchedUser: PropTypes.func.isRequired,
 };
-
 export default SearchForm;
