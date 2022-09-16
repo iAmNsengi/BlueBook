@@ -80,6 +80,7 @@ const MessageInput = () => {
             className="hidden"
             ref={fileInputRef}
             onChange={handleImageChange}
+            autoFocus
           />
           <button
             type="button"
