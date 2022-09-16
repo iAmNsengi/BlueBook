@@ -49,7 +49,7 @@ const ChatContainer = () => {
           <>
             {new Date(message?.createdAt).toLocaleDateString() !==
             new Date(arr[i - 1]?.createdAt).toLocaleDateString() ? (
-              <div className="text-center">
+              <div className="divider text-xs">
                 {new Date(message?.createdAt).toDateString()}{" "}
               </div>
             ) : (
