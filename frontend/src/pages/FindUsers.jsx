@@ -1,6 +1,8 @@
 import { Search } from "lucide-react";
+import { useAuthStore } from "../store/useAuthStore";
 
 const FindUsers = () => {
+  const { users } = useAuthStore();
   return (
     <div className="h-screen bg-base-200">
       <div className="flex items-center justify-center pt-20 px-4">
