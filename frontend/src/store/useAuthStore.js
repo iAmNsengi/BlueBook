@@ -10,13 +10,17 @@ const BASE_URL =
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
+
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
   isDeletingAccount: false,
   isCheckingAuth: true,
-  onlineUsers: [],
   socket: null,
+
+  onlineUsers: [],
+  isFindingAllUsers: false,
+  allUsers: [],
 
   checkAuth: async () => {
     try {
@@ -105,6 +109,19 @@ export const useAuthStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isDeletingAccount: false });
+    }
+  },
+
+  getAllUsers: async () => {
+    set({ isFindingAllUsers: true });
+    try {
+      const res = await axiosInstance.get("/messages/users");
+      set({ allUsers: res.data });
+    } catch (error) {
+      console.error("Error occurred in getuser", error);
+      toast.error(error.response.data.message);
+    } finally {
+      set({ isFindingAllUsers: false });
     }
   },
 

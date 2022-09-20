@@ -1,8 +1,14 @@
 import { Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
+import { Suspense, useEffect } from "react";
 
 const FindUsers = () => {
-  const { users } = useAuthStore();
+  const { onlineUsers, allUsers, getAllUsers } = useAuthStore();
+
+  useEffect(() => {
+    getAllUsers();
+  }, [getAllUsers]);
+
   return (
     <div className="h-screen bg-base-200">
       <div className="flex items-center justify-center pt-20 px-4">
@@ -18,7 +24,44 @@ const FindUsers = () => {
                 <Search />
               </button>
             </form>
-            <div className="flex items-center"></div>
+            <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
+              {Array.isArray(allUsers) && allUsers.length > 0 ? (
+                allUsers.map((user) => (
+                  <div
+                    key={user?._id}
+                    className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors cursor-pointer 
+                  }`}
+                  >
+                    <div className="relative flex flex-col mx-auto lg:mx-0  ">
+                      <img
+                        src={user?.profilePic || "avatar.png"}
+                        alt={user?.fullName}
+                        className="size-12 object-cover rounded-full"
+                      />
+                      {onlineUsers.includes(user?._id) && (
+                        <span className="absolute top-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
+                      )}
+                      <div className="text-xs lg:hidden">{user?.fullName}</div>
+                    </div>
+
+                    <div className="hidden lg:block text-left min-w-0">
+                      <div className="font-medium truncate">
+                        {user?.fullName}{" "}
+                      </div>
+                      <div className="text-xs text-zinc-400">
+                        {onlineUsers.includes(user?._id) ? (
+                          <span className="text-green-600">Online</span>
+                        ) : (
+                          <span className="text-red-600">Offline</span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p>No users found.</p>
+              )}
+            </div>
           </div>
         </div>
       </div>
