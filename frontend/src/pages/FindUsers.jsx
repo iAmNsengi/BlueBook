@@ -1,13 +1,22 @@
 import { Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
+import { useChatStore } from "../store/useChatStore";
+import { useNavigate } from "react-router-dom";
 
 const FindUsers = () => {
   const { onlineUsers, allUsers, getAllUsers } = useAuthStore();
+    const { setSelectedUser } = useChatStore();
+    const navigate = useNavigate()
 
   useEffect(() => {
     getAllUsers();
   }, [getAllUsers]);
+
+    const moveToChat = (user) => {
+        setSelectedUser(user)
+        navigate("/chat")
+  };
 
   return (
     <div className="h-screen bg-base-200">
@@ -26,9 +35,10 @@ const FindUsers = () => {
             </form>
             <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
               {Array.isArray(allUsers) && allUsers.length > 0 ? (
-                allUsers.map((user) => (
-                  <div
+                allUsers.slice(0, 10).map((user) => (
+                  <button
                     key={user?._id}
+                    onClick={() => moveToChat(user)}
                     className={`w-full p-3 flex items-center gap-3 hover:bg-base-300 transition-colors cursor-pointer 
                   }`}
                   >
@@ -56,7 +66,7 @@ const FindUsers = () => {
                         )}
                       </div>
                     </div>
-                  </div>
+                  </button>
                 ))
               ) : (
                 <p>No users found.</p>
