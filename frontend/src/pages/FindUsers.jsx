@@ -1,41 +1,57 @@
 import { Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useNavigate } from "react-router-dom";
 
 const FindUsers = () => {
   const { onlineUsers, allUsers, getAllUsers } = useAuthStore();
-    const { setSelectedUser } = useChatStore();
-    const navigate = useNavigate()
+  const { setSelectedUser, searchUsers, users } = useChatStore();
+  const [searchQuery, setSearchQuery] = useState(null);
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     getAllUsers();
   }, [getAllUsers]);
 
-    const moveToChat = (user) => {
-        setSelectedUser(user)
-        navigate("/chat")
+  const moveToChat = (user) => {
+    setSelectedUser(user);
+    navigate("/chat");
   };
+  const filterUsers = (e) => {
+    e.preventDefault();
+    console.log(searchQuery);
+
+    if (searchQuery.trim()) {
+      searchUsers(searchQuery);
+    }
+  };
+
+  const filteredUsers = users.length ? users : allUsers.slice(0, 10);
 
   return (
     <div className="h-screen bg-base-200">
       <div className="flex items-center justify-center pt-20 px-4">
         <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-7xl h-[calc(100vh-8rem]">
           <div className="h-[80vh] rounded-lg overflow-hidden">
-            <form className="w-full flex items-center p-2 gap-1">
+            <form
+              className="w-full flex items-center p-2 gap-1"
+              onSubmit={filterUsers}
+            >
               <input
                 type="text"
                 className="input input-bordered w-full"
                 placeholder="Search for users..."
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
               <button className="btn btn-square">
                 <Search />
               </button>
             </form>
             <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
-              {Array.isArray(allUsers) && allUsers.length > 0 ? (
-                allUsers.slice(0, 10).map((user) => (
+              {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
+                filteredUsers.slice(0, 10).map((user) => (
                   <button
                     key={user?._id}
                     onClick={() => moveToChat(user)}
