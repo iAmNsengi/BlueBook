@@ -21,11 +21,7 @@ const FindUsers = () => {
   };
   const filterUsers = (e) => {
     e.preventDefault();
-    console.log(searchQuery);
-
-    if (searchQuery.trim()) {
-      searchUsers(searchQuery);
-    }
+    if (searchQuery.trim()) searchUsers(searchQuery);
   };
 
   const filteredUsers = users.length ? users : allUsers.slice(0, 10);
