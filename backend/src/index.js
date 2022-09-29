@@ -47,6 +47,8 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/posts", messageRoutes);
+
 
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
