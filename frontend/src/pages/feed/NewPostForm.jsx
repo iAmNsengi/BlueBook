@@ -28,7 +28,11 @@ const NewPostForm = () => {
   const fileInputRef = useRef(null);
 
   const handleModelChange = (content) => {
-    setEditorContent(content);
+    if (content) {
+      setEditorContent(content);
+    } else {
+      console.error("Received null or undefined content");
+    }
   };
 
   const handleSubmit = (e) => {
@@ -39,7 +43,11 @@ const NewPostForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="px-4 py-6  rounded-lg shadow-md">
+    <form
+      onSubmit={handleSubmit}
+      className="px-4 py-6  rounded-lg shadow-md editor"
+      id="editor"
+    >
       <h2 className="text-2xl font-bold mb-4">Add Post</h2>
       <FroalaEditorComponent
         model={editorContent}
@@ -57,7 +65,7 @@ const NewPostForm = () => {
             "clearFormatting",
             "insertImage",
           ],
-          imageUpload: true,
+          imageUpload: false,
         }}
       />
       <div className="mt-4 flex items-center justify-end gap-2">
