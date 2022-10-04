@@ -37,7 +37,7 @@ const NewPostForm = () => {
 
   const fileInputRef = useRef(null);
 
-  const handleEditorChange = (content, editor) => {
+  const handleEditorChange = (content) => {
     setEditorContent(content);
   };
 
