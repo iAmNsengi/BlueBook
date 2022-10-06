@@ -1,4 +1,4 @@
-// import Feed from "./feed/Feed";
+import Feed from "./feed/Feed";
 import NewPostForm from "./feed/NewPostForm";
 
 const HomePage = () => {
@@ -8,7 +8,8 @@ const HomePage = () => {
         <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-7xl h-[calc(100vh-8rem]">
           <div className="h-full rounded-lg overflow-hidden">
             <NewPostForm />
-            {/* <Feed /> */}
+            <div className="divider"></div>
+            <Feed />
           </div>
         </div>
       </div>

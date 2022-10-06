@@ -1,6 +1,7 @@
 const Feed = () => {
   return (
-    <div className="p-4">
+      <div className="p-4">
+          
       <div className="grid grid-cols-1 gap-4">
         <div className="card bg-base-100 shadow-lg transition-transform transform hover:scale-105">
           <div className="card-header flex items-center p-4 border-b">

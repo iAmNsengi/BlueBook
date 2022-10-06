@@ -54,7 +54,6 @@ const NewPostForm = () => {
 
   return (
     <form onSubmit={handleSubmit} className="px-4 py-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Add Post</h2>
       <Editor
         apiKey="iimwa8mt2kajduemd6v24b2kurxwpkyop5m0tjigba1xg4eh"
         onInit={(evt, editor) => (editorRef.current = editor)}
