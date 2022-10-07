@@ -8,7 +8,6 @@ const HomePage = () => {
         <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-7xl h-[calc(100vh-8rem]">
           <div className="h-full rounded-lg overflow-hidden">
             <NewPostForm />
-            <div className="divider"></div>
             <Feed />
           </div>
         </div>

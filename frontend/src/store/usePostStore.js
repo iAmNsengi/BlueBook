@@ -8,122 +8,25 @@ const BASE_URL =
     ? "http://localhost:5001"
     : "https://vuga-backend.onrender.com";
 
-export const useAuthStore = create((set, get) => ({
-  authUser: null,
-
-  isSigningUp: false,
-  isLoggingIn: false,
-  isUpdatingProfile: false,
-  isDeletingAccount: false,
-  isCheckingAuth: true,
+export const usePostStore = create((set, get) => ({
   socket: null,
+  isGettingPosts: false,
 
   posts: [],
   isFindingPosts: false,
 
-  checkAuth: async () => {
+  getAllPosts: async () => {
+    set({ isGettingPosts: true });
     try {
-      const response = await axiosInstance.get("/auth/check");
-      set({ authUser: response.data });
-      get().connectSocket();
+      const res = await axiosInstance.get("/posts");
+      set({ posts: res.data });
     } catch (error) {
-      console.log("Error in checkAuth", error);
-      set({ authUser: null });
-    } finally {
-      set({ isCheckingAuth: false });
-    }
-  },
-
-  signUp: async (data) => {
-    if (data) set({ isSigningUp: true });
-    try {
-      const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
-      await get().checkAuth();
-      if (res?.data) toast.success("Account created successfully!");
-      get().connectSocket();
-    } catch (error) {
-      console.log("An internal server error occurred ", error);
+      console.error("An error occurred in Get all posts", error);
       toast.error(error.response.data.message);
     } finally {
-      set({ isSigningUp: false });
+      set({ isGettingPosts: false });
     }
   },
-
-  logout: async () => {
-    try {
-      const currentUser = get().authUser;
-      await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
-      toast.success(`Until we meet again ${currentUser.fullName} 👌`);
-      get().disconnectSocket();
-    } catch (error) {
-      console.log("Error in logout", error);
-      toast.error(error.response.data.message);
-    }
-  },
-
-  login: async (data) => {
-    if (data) set({ isLoggingIn: true });
-    try {
-      set({ authUser: null });
-      const res = await axiosInstance.post("/auth/login", data);
-      if (!res?.data?._id) return toast.error("Invalid response from server");
-
-      set({ authUser: res.data });
-      await get().checkAuth();
-      if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
-      get().connectSocket();
-    } catch (error) {
-      console.log("Error in login", error);
-      toast.error(error.response?.data?.message || "Login failed");
-      set({ authUser: null });
-    } finally {
-      set({ isLoggingIn: false });
-    }
-  },
-
-  updateProfile: async (data) => {
-    if (data) set({ isUpdatingProfile: true });
-    try {
-      const res = await axiosInstance.put("/auth/update-profile", data);
-      set({ authUser: res.data });
-      toast.success("Profile picture updated successfully 👌");
-    } catch (error) {
-      console.error("Error in update profile", error);
-      toast.error(error.response.data.message);
-    } finally {
-      set({ isUpdatingProfile: false });
-    }
-  },
-  deleteAccount: async () => {
-    set({ isDeletingAccount: true });
-    try {
-      await axiosInstance.delete("/auth/delete-account");
-      set({ authUser: null });
-      get().disconnectSocket();
-      toast.success("Sad to see you going, hope you will be back soon 🤗");
-    } catch (error) {
-      console.error("Error in delete account");
-      toast.error(error.response.data.message);
-    } finally {
-      set({ isDeletingAccount: false });
-    }
-  },
-
-  getAllUsers: async () => {
-    set({ isFindingAllUsers: true });
-    try {
-      const res = await axiosInstance.get("/messages/users");
-      set({ allUsers: res.data });
-    } catch (error) {
-      console.error("Error occurred in getuser", error);
-      toast.error(error.response.data.message);
-    } finally {
-      set({ isFindingAllUsers: false });
-    }
-  },
-
   connectSocket: () => {
     const { authUser } = get();
     if (!authUser || get().socket?.connected) return;
@@ -152,9 +55,5 @@ export const useAuthStore = create((set, get) => ({
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
     });
-  },
-
-  disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
   },
 }));
