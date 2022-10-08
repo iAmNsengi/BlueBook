@@ -1,6 +1,8 @@
 import express from "express";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import postRoutes from "./routes/post.route.js";
+
 import dotenv from "dotenv";
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
@@ -47,8 +49,7 @@ app.use((req, res, next) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
-app.use("/api/posts", messageRoutes);
-
+app.use("/api/posts", postRoutes);
 
 server.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
