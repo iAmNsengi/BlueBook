@@ -1,4 +1,4 @@
-import { Search } from "lucide-react";
+import { Loader, Loader2, Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
@@ -6,7 +6,8 @@ import { useNavigate } from "react-router-dom";
 import { shuffleElements } from "../lib/utils";
 
 const FindUsers = () => {
-  const { onlineUsers, allUsers, getAllUsers } = useAuthStore();
+  const { onlineUsers, allUsers, getAllUsers, isFindingAllUsers } =
+    useAuthStore();
   const { setSelectedUser, searchUsers, users } = useChatStore();
   const [searchQuery, setSearchQuery] = useState(null);
 
@@ -49,7 +50,7 @@ const FindUsers = () => {
               </button>
             </form>
             <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
-              {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
+              {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <button
                     key={user?._id}
@@ -84,7 +85,15 @@ const FindUsers = () => {
                   </button>
                 ))
               ) : (
-                <p>No users found.</p>
+                <>
+                  {isFindingAllUsers ? (
+                    <p>
+                      <Loader2 className="animate-spin" />{" "}
+                    </p>
+                  ) : (
+                    <p>No users found</p>
+                  )}
+                </>
               )}
             </div>
           </div>
