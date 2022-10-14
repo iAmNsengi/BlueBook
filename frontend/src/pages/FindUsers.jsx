@@ -1,4 +1,4 @@
-import { Loader, Loader2, Search } from "lucide-react";
+import { Loader2, Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
