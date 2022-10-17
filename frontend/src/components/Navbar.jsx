@@ -38,11 +38,11 @@ const Navbar = () => {
             {authUser && (
               <>
                 <Link to={"/chat"} className="btn btn-sm gap-2">
-                  <MessageCircle className="size-5" />
+                  <MessageCircle className="size-5 hidden sm:inline" />
                   Chats
                 </Link>
                 <Link to={"/find-friends"} className="btn btn-sm gap-2">
-                  <UserSearchIcon className="size-5" />
+                  <UserSearchIcon className="size-5 hidden sm:inline" />
                   Find Users
                 </Link>
                 <Link to={"/profile"} className="btn btn-sm gap-2">
