@@ -14,10 +14,8 @@ const NewPostForm = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
+    if (!file.type.startsWith("image/"))
+      return toast.error("Please select an image file");
 
     setImage(file);
     const reader = new FileReader();
@@ -43,13 +41,8 @@ const NewPostForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!editorContent.trim() && !image) {
-      toast.error("Please add some content or an image");
-      return;
-    }
-    console.log(editorContent);
-    console.log(image);
-    // Add your submit logic here
+    if (!editorContent.trim() && !image)
+      return toast.error("Please add some content or an image");
   };
 
   return (
