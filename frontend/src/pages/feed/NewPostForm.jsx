@@ -1,13 +1,16 @@
-import { Image, Send, X } from "lucide-react";
+import { Image, Loader, Loader2, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import toast from "react-hot-toast";
+import { usePostStore } from "../../store/usePostStore";
 
 const NewPostForm = () => {
   const [editorContent, setEditorContent] = useState("");
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const editorRef = useRef(null);
+
+  const { isCreatingNewPosts } = usePostStore();
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -117,7 +120,11 @@ const NewPostForm = () => {
           }`}
           onClick={() => fileInputRef.current?.click()}
         >
-          <Image size={20} />
+          {isCreatingNewPosts ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <Image size={20} />
+          )}
         </button>
         <button
           type="submit"
