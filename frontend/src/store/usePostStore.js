@@ -28,10 +28,10 @@ export const usePostStore = create((set, get) => ({
       set({ isGettingPosts: false });
     }
   },
-  createPost: async () => {
+  createPost: async (data) => {
     set({ isCreatingNewPost: true });
     try {
-      const res = await axiosInstance.post("/posts/add");
+      const res = await axiosInstance.post("/posts/add", data);
       set({ posts: [...get().posts, res.data] });
       toast.success("Post added successfully");
     } catch (error) {

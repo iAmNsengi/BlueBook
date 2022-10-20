@@ -1,4 +1,4 @@
-import { Image, Loader, Loader2, Send, X } from "lucide-react";
+import { Image, Loader2, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ const NewPostForm = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const editorRef = useRef(null);
 
-  const { isCreatingNewPosts } = usePostStore();
+  const { isCreatingNewPosts, createPost } = usePostStore();
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -46,6 +46,7 @@ const NewPostForm = () => {
     e.preventDefault();
     if (!editorContent.trim() && !image)
       return toast.error("Please add some content or an image");
+    createPost({ content: editorContent.trim(), image: image });
   };
 
   return (
