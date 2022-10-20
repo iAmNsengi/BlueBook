@@ -46,7 +46,7 @@ const NewPostForm = () => {
     e.preventDefault();
     if (!editorContent.trim() && !image)
       return toast.error("Please add some content or an image");
-    createPost({ content: editorContent.trim(), image: image });
+    createPost({ content: editorContent.trim(), image: imagePreview });
   };
 
   return (
