@@ -23,8 +23,10 @@ export const createPost = async (req, res) => {
     const { content, image } = req.body;
     const userId = req.user?._id;
     let uploadedImageURL;
+
     if (image) {
-      uploadedImageURL = await cloudinary.uploader.upload(profilePic);
+      const uploadResult = await cloudinary.uploader.upload(image);
+      uploadedImageURL = uploadResult.secure_url;
     }
     const author = await User.findById(userId);
 
@@ -37,10 +39,11 @@ export const createPost = async (req, res) => {
       image: uploadedImageURL,
     });
     await newPost.save();
+
     return res.status(201).json({ message: "Post added successfully" });
   } catch (error) {
     console.log(
-      "An internal server error occured in create POst",
+      "An internal server error occured in create Post",
       error.message
     );
     return res.status(500).json({
