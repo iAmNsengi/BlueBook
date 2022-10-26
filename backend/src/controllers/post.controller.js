@@ -1,11 +1,11 @@
 import cloudinary from "../lib/cloudinary.js";
+import { io } from "../lib/socket.js";
 import Post from "../models/post.model.js";
-import validator from "validator";
 import User from "../models/user.model.js";
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort("createdAt");
+    const posts = await Post.find().sort("-createdAt");
     return res.status(200).json(posts);
   } catch (error) {
     console.log(
@@ -19,6 +19,30 @@ export const getAllPosts = async (req, res) => {
 };
 
 export const createPost = async (req, res) => {
+  const loggedInUserId = req?.user?._id;
+
+  const conversations = await Message.find({
+    $or: [
+      {
+        senderId: loggedInUserId,
+      },
+      {
+        receiverId: loggedInUserId,
+      },
+    ],
+  })
+    .sort("-createdAt")
+    .select("senderId receiverId");
+
+  const usersWeChat = [
+    ...new Set(
+      conversations.flatMap((convo) => [
+        convo.senderId.toString(),
+        convo.receiverId.toString(),
+      ])
+    ),
+  ].filter((id) => id !== loggedInUserId.toString());
+
   try {
     const { content, image } = req.body;
     const userId = req.user?._id;
@@ -39,6 +63,8 @@ export const createPost = async (req, res) => {
       image: uploadedImageURL,
     });
     await newPost.save();
+
+    io.emit(usersWeChat, "newPost");
 
     return res.status(201).json({ message: "Post added successfully" });
   } catch (error) {
