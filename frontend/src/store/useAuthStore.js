@@ -66,6 +66,7 @@ export const useAuthStore = create((set, get) => ({
 
   login: async (data) => {
     if (data) set({ isLoggingIn: true });
+    2;
     try {
       set({ authUser: null });
       const res = await axiosInstance.post("/auth/login", data);
@@ -98,7 +99,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
   deleteAccount: async () => {
-    set({ isDeletingAccount: true }); 
+    set({ isDeletingAccount: true });
     try {
       await axiosInstance.delete("/auth/delete-account");
       set({ authUser: null });
@@ -152,6 +153,7 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
+      toast.success("Getting online user");
     });
   },
 

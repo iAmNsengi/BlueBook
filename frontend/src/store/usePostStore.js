@@ -12,6 +12,7 @@ export const usePostStore = create((set, get) => ({
   socket: null,
   isGettingPosts: false,
   isCreatingNewPost: false,
+  newPostAlert: false,
 
   posts: [],
   isFindingPosts: false,
@@ -21,6 +22,7 @@ export const usePostStore = create((set, get) => ({
     try {
       const res = await axiosInstance.get("/posts");
       set({ posts: res.data });
+      get().connectSocket();
     } catch (error) {
       console.error("An error occurred in Get all posts", error);
       toast.error(error.response.data.message);
@@ -40,6 +42,9 @@ export const usePostStore = create((set, get) => ({
     } finally {
       set({ isCreatingNewPost: false });
     }
+  },
+  removeNewPostAlert: () => {
+    set({ newPostAlert: false });
   },
   connectSocket: () => {
     const { authUser } = get();
@@ -66,8 +71,10 @@ export const usePostStore = create((set, get) => ({
       console.error("Socket connection error:", error);
     });
 
-    socket.on("getOnlineUsers", (userIds) => {
-      set({ onlineUsers: userIds });
+    socket.on("newPost", (post) => {
+      set({ newPostAlert: true });
+      toast.success("A new post just arrived");
+      set({ posts: [...get().posts, post] });
     });
   },
 }));

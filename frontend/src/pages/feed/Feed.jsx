@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 const Feed = () => {
-  const { posts, getAllPosts, isLoadingPosts } = usePostStore();
+  const { posts, getAllPosts, isLoadingPosts, newPostAlert } = usePostStore();
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [savedPosts, setSavedPosts] = useState(new Set());
 
@@ -46,6 +46,9 @@ const Feed = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      {newPostAlert && (
+        <button className="btn btn-red-700 size-20">New Posts</button>
+      )}
       {posts.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-lg font-medium">No posts yet</p>
