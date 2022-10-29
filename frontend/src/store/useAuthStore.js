@@ -153,7 +153,6 @@ export const useAuthStore = create((set, get) => ({
 
     socket.on("getOnlineUsers", (userIds) => {
       set({ onlineUsers: userIds });
-      toast.success("Getting online user");
     });
   },
 
