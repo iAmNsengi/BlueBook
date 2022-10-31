@@ -28,7 +28,7 @@ export const getAllPosts = async (req, res) => {
           convo.receiverId.toString(),
         ])
       ),
-    ].filter((id) => id !== loggedInUserId.toString());
+    ];
 
     console.log(usersWeChat);
     // only show posts from users we chat
