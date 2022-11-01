@@ -36,7 +36,7 @@ export const usePostStore = create((set, get) => ({
       const res = await axiosInstance.post("/posts/add", data);
       console.log(res.data);
 
-      set({ posts: [...get().posts, res.data] });
+      set({ posts: [res.data, ...get().posts] });
 
       toast.success("Post added successfully");
     } catch (error) {
