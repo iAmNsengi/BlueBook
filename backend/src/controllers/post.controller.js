@@ -29,9 +29,7 @@ export const getAllPosts = async (req, res) => {
         ])
       ),
     ];
-
-    console.log(usersWeChat);
-    // only show posts from users we chat
+    // only show posts from users we chat and mine
     const posts = await Post.find({ author: { $in: usersWeChat } }).sort(
       "-createdAt"
     );
@@ -107,9 +105,7 @@ export const createPost = async (req, res) => {
       }
     });
 
-    console.log("Socket ids to notify -------", socketIdsToNotify);
-
-    return res.status(201).json({ message: "Post added successfully" });
+    return res.status(201).json(newPost);
   } catch (error) {
     console.log(
       "An internal server error occured in create Post",
