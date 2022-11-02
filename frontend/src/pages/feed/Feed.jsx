@@ -5,7 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 
 const Feed = () => {
-  const { posts, getAllPosts, isLoadingPosts, newPostAlert } = usePostStore();
+  const { posts, getAllPosts, isGettingPosts, newPostAlert } = usePostStore();
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [savedPosts, setSavedPosts] = useState(new Set());
 
@@ -18,11 +18,8 @@ const Feed = () => {
   const handleLike = (postId) => {
     setLikedPosts((prev) => {
       const newLiked = new Set(prev);
-      if (newLiked.has(postId)) {
-        newLiked.delete(postId);
-      } else {
-        newLiked.add(postId);
-      }
+      if (newLiked.has(postId)) newLiked.delete(postId);
+      else newLiked.add(postId);
       return newLiked;
     });
   };
@@ -36,20 +33,14 @@ const Feed = () => {
     });
   };
 
-  if (isLoadingPosts) {
-    return (
-      <div className="flex justify-center items-center min-h-[200px]">
-        <Loader2 className="animate-spin h-8 w-8 text-primary" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
       {newPostAlert && (
         <button className="btn btn-red-700 size-20">New Posts</button>
       )}
-      {posts.length === 0 ? (
+      {isGettingPosts ? (
+        <Loader2 className="animate-spin text-center mx-auto size-20" />
+      ) : posts.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-lg font-medium">No posts yet</p>
           <p className="text-sm opacity-70">Be the first to share something!</p>
