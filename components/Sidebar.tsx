@@ -3,7 +3,6 @@ import NewDocumentButton from "./NewDocumentButton";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -11,20 +10,25 @@ import {
 import { MenuIcon } from "lucide-react";
 
 const Sidebar = () => {
+  const menuOptions = (
+    <>
+      <NewDocumentButton />
+
+      {/* My docs */}
+    </>
+  );
   return (
     <div className="p-2 md:p-5 bg-gray-200 relative">
-      <div className="hidden md:inline">
-        <NewDocumentButton />
-      </div>
+      <div className="hidden md:inline">{menuOptions}</div>
       <div className="md:hidden">
         <Sheet>
           <SheetTrigger>
-            <MenuIcon />
+            <MenuIcon className="hover:opacity-30 rounded-lg" />
           </SheetTrigger>
           <SheetContent side={"left"}>
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
-              <div>{/** options */}</div>
+              <div> {menuOptions} </div>
             </SheetHeader>
           </SheetContent>
         </Sheet>
