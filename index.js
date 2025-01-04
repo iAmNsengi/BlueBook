@@ -25,7 +25,5 @@ httpServer.listen(8080, () => console.log("Server is listening on port 8080"));
 
 function sendMessageEvery5Seconds() {
   connection.send(`Message ${Math.random()}`);
-  setInterval(() => {
-    sendMessageEvery5Seconds();
-  }, 5000);
+  setTimeout(sendMessageEvery5Seconds, 1000);
 }
