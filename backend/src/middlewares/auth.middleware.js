@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+import User from "../models/user.model.js";
 
 export const isLoggedIn = async (req, res, next) => {
   try {
@@ -7,7 +8,7 @@ export const isLoggedIn = async (req, res, next) => {
       return res
         .status(401)
         .json({ message: "Unauthorized -- No token was provided" });
-    const decoded = await jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     if (!decoded)
       return res.status(401).json({ message: "Unauthorized -- Invalid token" });
 
