@@ -7,6 +7,8 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT;
+// middleware to allow access to json body
+app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 
