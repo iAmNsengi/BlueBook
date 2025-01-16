@@ -11,15 +11,39 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
+import RegexCraft from "regexcraft";
+import toast from "react-hot-toast";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
   const [formData, setFormData] = useState();
   const { signUp, isSigningUp } = useAuthStore();
 
-  const validateForm = () => {};
+  const validateForm = () => {
+    const passwordValidator = new RegexCraft()
+      .hasMinLength(8)
+      .hasUpperCase(1)
+      .hasNumber(1)
+      .hasSpecialCharacter(1);
+    const emailValidator = new RegexCraft().isEmail();
+    const fullNameValidator = new RegexCraft().hasLetter(3).hasNoNumber();
+
+    if (!fullNameValidator.testOne(formData.fullName).isValid)
+      return toast.error(
+        "Invalid name, you need at least 3 letters and no number."
+      );
+
+    if (!emailValidator.testOne(formData.email).isValid)
+      return toast.error("Invalid email address.");
+
+    if (!passwordValidator.testOne(formData.password).isValid)
+      return toast.error(
+        "Password must have a length of at least 8 characters, 1 uppercase, 1 number and 1 special character."
+      );
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
+    const success = validateForm();
   };
 
   return (
@@ -30,7 +54,7 @@ const SignUpPage = () => {
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="size-6 text-primary" />
+                <MessageSquare className="size-6 text-primary animate-pulse" />
               </div>
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
               <p className="text-base-content/60">
@@ -40,7 +64,7 @@ const SignUpPage = () => {
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
-              <label className="lavel">
+              <label className="label">
                 <span className="label-text font-medium">Full Name</span>
               </label>
               <div className="relative">
