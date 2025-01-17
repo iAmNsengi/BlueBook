@@ -20,7 +20,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="h-screen pt-20 text-white">
+    <div className="h-screen pt-20">
       <div className="max-w-2xl mx-auto p-4 py-8">
         <div className="bg-base-300/80 rounded-xl p-6 space-y-8">
           <div className="text-center">
@@ -99,7 +99,7 @@ const ProfilePage = () => {
                   </div>
                   <div className="flex items-center gap-20 justify-between py-2">
                     <span>Account Status</span>
-                    <span className="bg-green-500 px-3 py-2 rounded-xl animate-pulse font-bold">
+                    <span className="bg-green-500 px-3 py-2 text-white rounded-xl animate-pulse font-bold">
                       Active{" "}
                     </span>
                   </div>
