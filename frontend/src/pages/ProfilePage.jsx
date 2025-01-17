@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Loader2, User } from "lucide-react";
 
@@ -20,7 +20,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="h-full mt-20 text-white">
+    <div className="h-screen pt-20 text-white">
       <div className="max-w-2xl mx-auto p-4 py-8">
         <div className="bg-base-300/80 rounded-xl p-6 space-y-8">
           <div className="text-center">

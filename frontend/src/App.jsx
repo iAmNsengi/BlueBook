@@ -25,7 +25,7 @@ const App = () => {
     );
 
   return (
-    <div>
+    <div data-theme="sunset">
       <Navbar />
       <Routes>
         <Route
