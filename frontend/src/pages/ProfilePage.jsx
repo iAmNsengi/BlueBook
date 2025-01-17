@@ -1,14 +1,22 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Camera, Loader2, User } from "lucide-react";
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
-  const fileRef = useRef();
+  const [selectedImage, setSelectedImage] = useState(null);
+
   const handleInputChange = async (e) => {
     e.preventDefault();
-    alert("Image changed");
-    console.log(fileRef);
+    const file = e.target.files[0];
+    if (!file) return toast.error("No image file was selected 😒");
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      setSelectedImage(base64Image);
+      await updateProfile({ profilePic: base64Image });
+    };
   };
 
   return (
@@ -25,7 +33,7 @@ const ProfilePage = () => {
           <div className="flex flex-col items-center gap-4">
             <div className="relative">
               <img
-                src={authUser.profilePic || "/avatar.png"}
+                src={selectedImage || authUser.profilePic || "/avatar.png"}
                 alt=""
                 className="size-32 rounded-full object-cover border-2"
               />
@@ -38,7 +46,6 @@ const ProfilePage = () => {
                 <Camera className="size-5 text-base-200" />
                 <input
                   type="file"
-                  ref={fileRef}
                   id="avatar-upload"
                   className="hidden"
                   accept="image/*"
@@ -49,16 +56,19 @@ const ProfilePage = () => {
             </div>
             <p className="text-sm text-zinc-400">
               {isUpdatingProfile ? (
-                <>
+                <div className="flex gap-2">
                   <Loader2 className="size-5 animate-spin font-bold" />{" "}
                   Uploading...
-                </>
+                </div>
               ) : (
-                "Click the camera icon to update your profile image 🌄"
+                <p className="border border-primary rounded-xl px-6 py-1 animate-pulse">
+                  {" "}
+                  Click the camera icon to update your profile image 🌄
+                </p>
               )}
             </p>
             <div className="space-y-5 py-10 pointer-events-none">
-              <div className="flex items-center justify-between gap-20 space-y-1 5">
+              <div className="flex items-center justify-between gap-40 space-y-1 5">
                 <div className="text-sm text-zinc-400 flex items-center gap-2">
                   <User className="size-4" />
                   Full Name
@@ -89,7 +99,9 @@ const ProfilePage = () => {
                   </div>
                   <div className="flex items-center gap-20 justify-between py-2">
                     <span>Account Status</span>
-                    <span className="text-green-500">Active </span>
+                    <span className="bg-green-500 px-3 py-2 rounded-xl animate-pulse font-bold">
+                      Active{" "}
+                    </span>
                   </div>
                 </div>
               </div>
