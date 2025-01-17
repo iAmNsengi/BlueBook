@@ -1,7 +1,7 @@
 import React from "react";
 
 const SettingsPage = () => {
-  return <div>Settings page</div>;
+  return <div className="text-white mt-20">Settings page</div>;
 };
 
 export default SettingsPage;
