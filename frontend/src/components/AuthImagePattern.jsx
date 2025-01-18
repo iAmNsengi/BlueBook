@@ -1,5 +1,3 @@
-import React from "react";
-
 const AuthImagePattern = ({ title, subtitle }) => {
   return (
     <div className="hidden lg:flex items-center justify-center bg-primary/10 p-12">
