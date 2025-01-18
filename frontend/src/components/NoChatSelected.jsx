@@ -1,5 +1,4 @@
 import { MessagesSquare } from "lucide-react";
-import React from "react";
 
 const NoChatSelected = () => {
   return (
