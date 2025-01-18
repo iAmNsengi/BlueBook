@@ -30,7 +30,7 @@ const ChatHeader = () => {
         {/* close button */}
 
         <button onClick={() => setSelectedUser(null)}>
-          <X />
+          <X className="bg-primary  rounded-lg p-2 size-10 border-2 hover:bg-transparent" />
         </button>
       </div>
     </div>
