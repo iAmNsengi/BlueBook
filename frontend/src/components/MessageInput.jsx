@@ -1,13 +1,13 @@
 import { useRef, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { Image, Send, X } from "lucide-react";
+import { Image, Loader2, Send, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 const MessageInput = () => {
   const [text, setText] = useState("");
   const [imagePreview, setImagePreview] = useState(null);
   const fileInputRef = useRef(null);
-  const { sendMessage } = useChatStore();
+  const { sendMessage, isSendingMessage } = useChatStore();
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -21,10 +21,25 @@ const MessageInput = () => {
     };
     reader.readAsDataURL(file);
   };
-  const removeImage = () => {};
+
+  const removeImage = () => {
+    setImagePreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
+    if (!text.trim() && !imagePreview) return;
+    try {
+      await sendMessage({ text: text.trim(), image: imagePreview });
+      // clear the form
+      setText("");
+      setImagePreview(null);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    } catch (error) {
+      console.error("Failed to send the message: ", error);
+      toast.error(error.message);
+    }
   };
 
   return (
@@ -56,6 +71,7 @@ const MessageInput = () => {
             className="w-full input input-bordered rounded-lg input-sm sm:input-md"
             placeholder="Type a message..."
             value={text}
+            disabled={isSendingMessage}
             onChange={(e) => setText(e.target.value)}
           />
           <input
@@ -81,9 +97,15 @@ const MessageInput = () => {
               ? "cursor-not-allowed "
               : "cursor-pointer bg-green-600"
           }`}
-          disabled={!text.trim() && !imagePreview}
+          disabled={(!text.trim() && !imagePreview) || isSendingMessage}
         >
-          <Send className="mx-auto" />
+          {isSendingMessage ? (
+            <>
+              <Loader2 className="size-5 animate-spin font-bold" />{" "}
+            </>
+          ) : (
+            <Send className="mx-auto" />
+          )}
         </button>
       </form>
     </div>

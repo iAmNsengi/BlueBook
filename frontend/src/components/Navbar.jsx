@@ -1,10 +1,16 @@
-import React from "react";
 import { useAuthStore } from "../store/useAuthStore";
 import { Link } from "react-router-dom";
 import { LogOut, MessagesSquare, Settings, User } from "lucide-react";
+import { useChatStore } from "../store/useChatStore";
 
 const Navbar = () => {
   const { logout, authUser } = useAuthStore();
+  const { setSelectedUser } = useChatStore();
+
+  const logoutUser = () => {
+    setSelectedUser(null);
+    logout();
+  };
 
   return (
     <header className="bg-base-100 border-b border-base-300 fixed w-full top-0 z-40 backdrop-blur-lg bg-base-100/80">
@@ -37,7 +43,7 @@ const Navbar = () => {
 
                 <button
                   className="flex gap-2 items-center border border-red-800 text-white bg-red-800 px-3 py-2 rounded-lg hover:bg-transparent hover:scale-90 hover:text-red-800"
-                  onClick={logout}
+                  onClick={logoutUser}
                 >
                   <LogOut className="size-5" />
                   <span className="hidden sm:inline">Logout</span>
