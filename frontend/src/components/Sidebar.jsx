@@ -20,6 +20,9 @@ const Sidebar = () => {
       <div className="border-b border-base-300 w-full p-5 flex gap-4">
         <Users className="size-6" />
         <span className="font-medium hidden lg:block">Contacts</span>
+        <span className="font-medium hidden lg:block">
+          Online users: {onlineUsers.length}
+        </span>
       </div>
       <div className="overflow-y-auto w-full py-3">
         {users.map((user) => (
@@ -39,7 +42,7 @@ const Sidebar = () => {
                 className="size-12 object-cover rounded-full"
               />
               {onlineUsers.includes(user._id) && (
-                <span className="absolute bottom-0 right-0 size-3 bg-green-500 rounded h-full ring-2 ring-zinc-900" />
+                <span className="absolute top-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
               )}
             </div>
 
