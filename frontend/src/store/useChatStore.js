@@ -56,7 +56,7 @@ export const useChatStore = create((set, get) => ({
     }
   },
   searchUsers: async (query) => {
-    set({ isSearchingUsers: false });
+    set({ isSearchingUsers: true });
     console.log(query);
 
     try {

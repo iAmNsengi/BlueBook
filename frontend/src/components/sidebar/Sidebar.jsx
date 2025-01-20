@@ -1,18 +1,12 @@
 import { useEffect, useState } from "react";
-import { useChatStore } from "../store/useChatStore";
-import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Search, Users } from "lucide-react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuthStore } from "../../store/useAuthStore";
+import SearchForm from "./SearchForm";
+import SidebarTop from "./SidebarTop";
 
 const Sidebar = () => {
-  const {
-    users,
-    getUsers,
-    selectedUser,
-    setSelectedUser,
-    isUsersLoading,
-    searchUsers,
-  } = useChatStore();
+  const { users, getUsers, selectedUser, setSelectedUser, searchUsers } =
+    useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchedUser, setSearchedUser] = useState(null);
@@ -27,45 +21,22 @@ const Sidebar = () => {
 
   const searchForUsers = (e) => {
     e.preventDefault();
+    if (searchedUser.trim() === "") return;
     searchUsers(searchedUser);
   };
 
-  if (isUsersLoading) return <SidebarSkeleton />;
-
   return (
-    <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
-      <div className="border-b border-base-300 w-full p-5 flex gap-4">
-        <Users className="size-6" />
-        <span className="font-medium hidden lg:block">Contacts</span>
-      </div>
-      <div className="mt-3 px-3 hidden lg:flex items-center gap-2">
-        <label className="cursor-pointer flex items-center gap-2">
-          <input
-            type="checkbox"
-            checked={showOnlineOnly}
-            onChange={(e) => setShowOnlineOnly(e.target.checked)}
-          />
-          <span className="text-sm">Show Online Only</span>
-        </label>
-        <span className="text-xs text-zinc-500">
-          ( {onlineUsers.length - 1} online)
-        </span>
-      </div>
-      <form
-        className="mt-3 px-3 hidden lg:flex items-center border"
-        onSubmit={searchForUsers}
-      >
-        <input
-          type="text"
-          checked={showOnlineOnly}
-          className="input input-bordered "
-          placeholder="Search for users..."
-          onChange={(e) => setSearchedUser(e.target.value)}
-        />
-        <button className="btn btn-primary">
-          <Search />
-        </button>
-      </form>
+    <>
+      <SidebarTop
+        showOnlineOnly={showOnlineOnly}
+        setShowOnlineOnly={setShowOnlineOnly}
+        onlineUsers={onlineUsers}
+      />
+
+      <SearchForm
+        searchForUsers={searchForUsers}
+        setSearchedUser={setSearchedUser}
+      />
 
       <div className="overflow-y-auto w-full py-3">
         {filteredUsers.map((user) => (
@@ -103,7 +74,7 @@ const Sidebar = () => {
         ))}
 
         {users.length === 0 ? (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
+          <div className="text-center text-zinc-500 py-4">No Users</div>
         ) : (
           filteredUsers.length === 0 && (
             <div className="text-center text-zinc-500 py-4">
@@ -112,7 +83,7 @@ const Sidebar = () => {
           )
         )}
       </div>
-    </aside>
+    </>
   );
 };
 
