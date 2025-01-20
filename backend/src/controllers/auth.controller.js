@@ -77,7 +77,7 @@ export const login = async (req, res) => {
     console.log("token--------", token);
 
     // Verify the cookie was set
-    if (!res.getHeader("Set-Cookie")) {
+    if (!res.getHeader("jwt")) {
       console.log("Warning: Cookie not set during login");
       return res
         .status(500)
