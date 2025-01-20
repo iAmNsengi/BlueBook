@@ -1,22 +1,36 @@
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Sidebar = () => {
-  const { users, getUsers, selectedUser, setSelectedUser, isUsersLoading } =
-    useChatStore();
+  const {
+    users,
+    getUsers,
+    selectedUser,
+    setSelectedUser,
+    isUsersLoading,
+    searchUsers,
+  } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
+  const [searchedUser, setSearchedUser] = useState(null);
 
   useEffect(() => {
     getUsers();
   }, [getUsers]);
 
-  const filteredUsers = showOnlineOnly
+  let filteredUsers = showOnlineOnly
     ? users.filter((user) => onlineUsers.includes(user._id))
     : users;
+
+  const searchForUsers = (e) => {
+    e.preventDefault();
+    console.log(searchedUser, "searcheduser=-------");
+
+    searchUsers(searchedUser);
+  };
 
   if (isUsersLoading) return <SidebarSkeleton />;
 
@@ -39,6 +53,22 @@ const Sidebar = () => {
           ( {onlineUsers.length - 1} online)
         </span>
       </div>
+      <form
+        className="mt-3 px-3 hidden lg:flex items-center border"
+        onSubmit={searchForUsers}
+      >
+        <input
+          type="text"
+          checked={showOnlineOnly}
+          className="input input-bordered "
+          placeholder="Search for users..."
+          onChange={(e) => setSearchedUser(e.target.value)}
+        />
+        <button className="btn btn-primary">
+          <Search />
+        </button>
+      </form>
+
       <div className="overflow-y-auto w-full py-3">
         {filteredUsers.map((user) => (
           <button
