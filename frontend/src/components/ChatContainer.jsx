@@ -55,12 +55,13 @@ const ChatContainer = () => {
               <div className="size-10 rounded-full border">
                 <img
                   src={
-                    message.sender?._id === authUser._id
+                    message?.senderId === authUser?._id
                       ? authUser.profilePic || "avatar.png"
                       : selectedUser.profilePic || "avatar.png"
                   }
                   alt={"profile pic"}
                 />
+                {console.log(message.senderId, authUser?._id)}
               </div>
             </div>
             <div className="chat-header mb-1">

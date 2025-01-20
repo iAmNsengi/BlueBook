@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../../components/AuthImagePattern";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,6 +20,8 @@ const LoginPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (formData.password === "" || formData.email.trim() === "")
+      return toast.error("All fields are required!");
     login(formData);
   };
 
@@ -77,7 +80,11 @@ const LoginPage = () => {
                 />
                 <button
                   className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() =>
+                    formData.password !== ""
+                      ? setShowPassword(!showPassword)
+                      : undefined
+                  }
                   type="button"
                 >
                   {showPassword ? <EyeClosed /> : <Eye />}{" "}
