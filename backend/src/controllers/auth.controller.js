@@ -75,10 +75,13 @@ export const login = async (req, res) => {
 
     const token = generateToken(user._id, res);
     console.log("token--------", token);
+    console.log("set-cookie----", res.getHeader("Set-Cookie"));
+    console.log("jwt-cookie----", res.getHeader("jwt"));
 
     // Verify the cookie was set
-    if (!res.getHeader("jwt")) {
+    if (!res.getHeader("Set-Cookie")) {
       console.log("Warning: Cookie not set during login");
+
       return res
         .status(500)
         .json({ message: "Failed to set authentication token" });
