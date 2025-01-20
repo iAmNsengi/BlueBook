@@ -74,14 +74,8 @@ export const login = async (req, res) => {
     }
 
     const token = generateToken(user._id, res);
-    console.log("token--------", token);
-    console.log("set-cookie----", res.getHeader("Set-Cookie"));
-    console.log("jwt-cookie----", res.getHeader("jwt"));
-
-    // Verify the cookie was set
     if (!res.getHeader("Set-Cookie")) {
       console.log("Warning: Cookie not set during login");
-
       return res
         .status(500)
         .json({ message: "Failed to set authentication token" });
@@ -132,6 +126,21 @@ export const updateProfile = async (req, res) => {
     return res.status(200).json(updatedUser);
   } catch (error) {
     console.log("An internal server error occurred", error.message);
+    return res
+      .status(500)
+      .json({ message: `An internal server error occurred, ${error.message}` });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    const deletedUser = await User.findByIdAndDelete(userId);
+    console.log(deleteAccount);
+
+    return res.status(200).json({ message: "User deleted successfully!" });
+  } catch (error) {
+    console.error("An error occurred in deleteAccount", error);
     return res
       .status(500)
       .json({ message: `An internal server error occurred, ${error.message}` });

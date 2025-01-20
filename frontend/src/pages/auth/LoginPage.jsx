@@ -1,5 +1,5 @@
-import  { useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import { useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
 import {
   ArrowBigRight,
   Eye,
@@ -8,46 +8,18 @@ import {
   Lock,
   Mail,
   MessageSquare,
-  User,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import AuthImagePattern from "../components/AuthImagePattern";
-import RegexCraft from "regexcraft";
-import toast from "react-hot-toast";
+import AuthImagePattern from "../../components/AuthImagePattern";
 
-const SignUpPage = () => {
-  const [showPassword, setShowPassword] = useState();
+const LoginPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState();
-  const { signUp, isSigningUp } = useAuthStore();
+  const { login, isLoggingIn } = useAuthStore();
 
-  const validateForm = () => {
-    const passwordValidator = new RegexCraft()
-      .hasMinLength(8)
-      .hasUpperCase(1)
-      .hasNumber(1)
-      .hasSpecialCharacter(1);
-    const emailValidator = new RegexCraft().isEmail();
-    const fullNameValidator = new RegexCraft().hasLetter(3).hasNoNumber();
-
-    if (!fullNameValidator.testOne(formData.fullName.trim()).isValid)
-      return toast.error(
-        "Invalid name, you need at least 3 letters and no number."
-      );
-
-    if (!emailValidator.testOne(formData.email.trim()).isValid)
-      return toast.error("Invalid email address.");
-
-    if (!passwordValidator.testOne(formData.password).isValid)
-      return toast.error(
-        "Password must have a length of at least 8 characters, 1 uppercase, 1 number and 1 special character."
-      );
-    return true;
-  };
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = validateForm();
-
-    if (success) signUp(formData);
+    login(formData);
   };
 
   return (
@@ -60,32 +32,13 @@ const SignUpPage = () => {
               <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
                 <MessageSquare className="size-6 text-primary animate-pulse" />
               </div>
-              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-              <p className="text-base-content/60">
-                Create an account to join Vuga community
-              </p>
+              <h1 className="text-2xl font-bold mt-2">
+                Welcome Back <span className="animate-pulse">🤗</span>{" "}
+              </h1>
+              <p className="text-base-content/60">Login to your accout</p>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Full Name</span>
-              </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40" />
-                </div>
-                <input
-                  required
-                  type="text"
-                  className="input input-bordered w-full pl-14"
-                  placeholder="John Doe"
-                  onChange={(e) =>
-                    setFormData({ ...formData, fullName: e.target.value })
-                  }
-                />
-              </div>
-            </div>
             <div className="form-control">
               <label className="lavel">
                 <span className="label-text font-medium">E-mail</span>
@@ -134,26 +87,26 @@ const SignUpPage = () => {
             <button
               type="submit"
               className="btn btn-primary w-full animate-pulse"
-              disabled={isSigningUp}
+              disabled={isLoggingIn}
             >
-              {isSigningUp ? (
+              {isLoggingIn ? (
                 <>
                   <Loader2 className="size-5 animate-spin font-bold" />{" "}
                   Submitting...
                 </>
               ) : (
                 <div className="flex items-center gap-2">
-                  Create Account <ArrowBigRight className="mt-1" />
+                  Login <ArrowBigRight className="mt-1" />
                 </div>
               )}
             </button>
           </form>
           <div className="text-center">
             <p className="text-base-content/60">
-              Already have an account?
-              <Link className="link link-primary" to={"/login"}>
+              Don&apos;t have an account?
+              <Link className="link link-primary" to={"/signup"}>
                 {" "}
-                Sign In
+                Sign Up
               </Link>
             </p>
           </div>
@@ -162,11 +115,11 @@ const SignUpPage = () => {
 
       {/* right side */}
       <AuthImagePattern
-        title="Join Vuga community now 😎"
-        subtitle="Join to stay connected to your friends and community 👌"
+        title="Welcome back 🤗"
+        subtitle="Stay connected to your friends and community 👌"
       />
     </div>
   );
 };
 
-export default SignUpPage;
+export default LoginPage;
