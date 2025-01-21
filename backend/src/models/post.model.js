@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose from "mongoose";
 
 const postSchema = new mongoose.Schema(
   {
@@ -11,7 +11,7 @@ const postSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
-    image: { type: string, required: false },
+    image: { type: String, required: false },
     comments: [
       {
         sender: {
@@ -26,7 +26,7 @@ const postSchema = new mongoose.Schema(
     ],
     likes: { type: Number, default: 0 },
   },
-  { timestamps }
+  { timestamps: true }
 );
 
 const Post = mongoose.model("Post", postSchema);
