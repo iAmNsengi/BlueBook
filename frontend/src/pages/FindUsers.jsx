@@ -3,6 +3,7 @@ import { useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useNavigate } from "react-router-dom";
+import { shuffleElements } from "../lib/utils";
 
 const FindUsers = () => {
   const { onlineUsers, allUsers, getAllUsers } = useAuthStore();
@@ -24,7 +25,9 @@ const FindUsers = () => {
     if (searchQuery.trim()) searchUsers(searchQuery);
   };
 
-  const filteredUsers = users.length ? users : allUsers.slice(0, 10);
+  const filteredUsers = users.length
+    ? users
+    : shuffleElements(allUsers).slice(0, 20);
 
   return (
     <div className="h-screen bg-base-200">
@@ -47,7 +50,7 @@ const FindUsers = () => {
             </form>
             <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
               {Array.isArray(filteredUsers) && filteredUsers.length > 0 ? (
-                filteredUsers.slice(0, 10).map((user) => (
+                filteredUsers.map((user) => (
                   <button
                     key={user?._id}
                     onClick={() => moveToChat(user)}
