@@ -12,6 +12,8 @@ import { useThemeStore } from "./store/useThemeStore";
 import Chat from "./pages/chat/Chat";
 import LoginPage from "./pages/auth/LoginPage";
 import FindUsers from "./pages/FindUsers";
+import "froala-editor/css/froala_style.min.css";
+import "froala-editor/css/froala_editor.pkgd.min.css";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
