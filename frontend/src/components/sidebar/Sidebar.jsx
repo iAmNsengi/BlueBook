@@ -15,9 +15,9 @@ const Sidebar = () => {
     getUsers();
   }, [getUsers]);
 
-  let filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user?._id))
-    : users;
+  const myOnlineUsers = users.filter((user) => onlineUsers.includes(user?._id));
+
+  const filteredUsers = showOnlineOnly ? myOnlineUsers : users;
 
   const searchForUsers = (e) => {
     e.preventDefault();
@@ -30,7 +30,7 @@ const Sidebar = () => {
       <SidebarTop
         showOnlineOnly={showOnlineOnly}
         setShowOnlineOnly={setShowOnlineOnly}
-        onlineUsers={onlineUsers}
+        onlineUsers={myOnlineUsers}
       />
 
       <SearchForm
@@ -49,7 +49,7 @@ const Sidebar = () => {
                 : ""
             }`}
           >
-            <div className="relative mx-auto lg:mx-0">
+            <div className="relative flex flex-col mx-auto lg:mx-0  ">
               <img
                 src={user?.profilePic || "avatar.png"}
                 alt={user?.fullName}
@@ -58,6 +58,7 @@ const Sidebar = () => {
               {onlineUsers.includes(user?._id) && (
                 <span className="absolute top-0 right-0 size-3 bg-green-500 rounded-full ring-2 ring-zinc-900" />
               )}
+              <div className="text-xs lg:hidden">{user?.fullName}</div>
             </div>
 
             <div className="hidden lg:block text-left min-w-0">

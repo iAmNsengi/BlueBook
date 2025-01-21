@@ -18,7 +18,7 @@ const SidebarTop = ({ showOnlineOnly, setShowOnlineOnly, onlineUsers }) => {
           <span className="text-sm">Show Online Only</span>
         </label>
         <span className="text-xs text-zinc-500">
-          ( {onlineUsers.length - 1} online)
+          ( {onlineUsers.length} online)
         </span>
       </div>
     </>

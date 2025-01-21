@@ -6,6 +6,7 @@ import {
   MessagesSquare,
   Settings,
   User,
+  UserSearchIcon,
 } from "lucide-react";
 import { useChatStore } from "../store/useChatStore";
 
@@ -39,6 +40,10 @@ const Navbar = () => {
                 <Link to={"/chat"} className="btn btn-sm gap-2">
                   <MessageCircle className="size-5" />
                   Chats
+                </Link>
+                <Link to={"/find-friends"} className="btn btn-sm gap-2">
+                  <UserSearchIcon className="size-5" />
+                  Find Users
                 </Link>
                 <Link to={"/profile"} className="btn btn-sm gap-2">
                   <User className="size-5" />
