@@ -71,9 +71,7 @@ const Feed = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">
-                    {post?.author?.fullName}
-                  </h3>
+                  <h3 className="font-semibold text-sm">{post?.authorName}</h3>
                   <p className="text-xs opacity-70">
                     {formatMessageTime(post?.createdAt)}
                   </p>

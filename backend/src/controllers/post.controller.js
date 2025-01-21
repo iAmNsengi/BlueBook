@@ -32,6 +32,7 @@ export const createPost = async (req, res) => {
 
     const newPost = new Post({
       author,
+      authorName: author?.fullName,
       content: content.trim(),
       image: uploadedImageURL,
     });
