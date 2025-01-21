@@ -65,7 +65,7 @@ export const useChatStore = create((set, get) => ({
       });
       set({ users: res.data });
     } catch (error) {
-      console.error("Error in sendMessage", error);
+      console.error("Error in searchUsers", error);
       toast.error(error.response.data.message);
     } finally {
       set({ isSearchingUsers: false });

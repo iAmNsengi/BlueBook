@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
@@ -44,12 +44,12 @@ const ChatContainer = () => {
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className={`flex-1 overflow-y-auto p-4 space-y-1`}>
         {messages.map((message, i, arr) => (
-          <>
+          <Fragment key={message?._id}>
             {new Date(message?.createdAt).toLocaleDateString() !==
             new Date(arr[i - 1]?.createdAt).toLocaleDateString() ? (
-              <div className="divider text-xs">
+              <div className="divider divider-neutral text-xs px-16">
                 {new Date(message?.createdAt).toDateString()}{" "}
               </div>
             ) : (
@@ -75,9 +75,15 @@ const ChatContainer = () => {
                 </div>
               </div>
               <div className="chat-header mb-1">
-                <time className="text-xs opacity-50 ml-1">
-                  {formatMessageTime(message.createdAt)}
-                </time>
+                {formatMessageTime(message.createdAt) ===
+                  formatMessageTime(arr[i - 1]?.createdAt) &&
+                message.senderId === arr[i - 1]?.senderId ? (
+                  <></>
+                ) : (
+                  <time className="text-xs opacity-50 ml-1">
+                    {formatMessageTime(message.createdAt)}
+                  </time>
+                )}
               </div>
               <div className="chat-bubble flex flex-col">
                 {message.image && (
@@ -91,7 +97,7 @@ const ChatContainer = () => {
                 {message.text && <p>{message.text}</p>}
               </div>
             </div>
-          </>
+          </Fragment>
         ))}
       </div>
       <MessageInput />
