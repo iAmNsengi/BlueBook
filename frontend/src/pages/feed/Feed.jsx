@@ -1,16 +1,19 @@
 import { Bookmark, Heart, Loader2, MessageCircle, Share2 } from "lucide-react";
-import { formatMessageTime } from "../../lib/utils";
 import { usePostStore } from "../../store/usePostStore";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
 
 const Feed = () => {
-  const { posts, getAllPosts, isLoadingPosts } = usePostStore();
+  const { posts, getAllPosts, isLoadingPosts, newPostAlert } = usePostStore();
   const [likedPosts, setLikedPosts] = useState(new Set());
   const [savedPosts, setSavedPosts] = useState(new Set());
 
   useEffect(() => {
     getAllPosts();
   }, [getAllPosts]);
+
+  dayjs.extend(relativeTime);
 
   const handleLike = (postId) => {
     setLikedPosts((prev) => {
@@ -43,6 +46,9 @@ const Feed = () => {
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+      {newPostAlert && (
+        <button className="btn btn-red-700 size-20">New Posts</button>
+      )}
       {posts.length === 0 ? (
         <div className="text-center py-10">
           <p className="text-lg font-medium">No posts yet</p>
@@ -70,7 +76,7 @@ const Feed = () => {
                 <div>
                   <h3 className="font-semibold text-sm">{post?.authorName}</h3>
                   <p className="text-xs opacity-70">
-                    {formatMessageTime(post?.createdAt)}
+                    {dayjs(post?.createdAt).fromNow()}
                   </p>
                 </div>
               </div>

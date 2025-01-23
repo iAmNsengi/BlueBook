@@ -1,4 +1,4 @@
-import { Image, Loader, Loader2, Send, X } from "lucide-react";
+import { Image, Loader2, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import toast from "react-hot-toast";
@@ -10,7 +10,7 @@ const NewPostForm = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const editorRef = useRef(null);
 
-  const { isCreatingNewPosts } = usePostStore();
+  const { isCreatingNewPost, createPost } = usePostStore();
 
   const handleImageChange = (e) => {
     e.preventDefault();
@@ -46,6 +46,8 @@ const NewPostForm = () => {
     e.preventDefault();
     if (!editorContent.trim() && !image)
       return toast.error("Please add some content or an image");
+    createPost({ content: editorContent.trim(), image: imagePreview });
+    setEditorContent("");
   };
 
   return (
@@ -120,11 +122,7 @@ const NewPostForm = () => {
           }`}
           onClick={() => fileInputRef.current?.click()}
         >
-          {isCreatingNewPosts ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <Image size={20} />
-          )}
+          <Image size={20} />
         </button>
         <button
           type="submit"
@@ -135,7 +133,7 @@ const NewPostForm = () => {
           }`}
           disabled={!editorContent.trim() && !imagePreview}
         >
-          <Send className="mx-auto" />
+          {isCreatingNewPost ? <Loader2 /> : <Send className="mx-auto" />}
         </button>
       </div>
     </form>

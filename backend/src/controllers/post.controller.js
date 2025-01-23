@@ -1,11 +1,40 @@
 import cloudinary from "../lib/cloudinary.js";
+import { io, userSocketMap } from "../lib/socket.js";
 import Post from "../models/post.model.js";
-import validator from "validator";
 import User from "../models/user.model.js";
+import Message from "../models/message.model.js";
 
 export const getAllPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort("createdAt");
+    const loggedInUserId = req?.user?._id;
+
+    const conversations = await Message.find({
+      $or: [
+        {
+          senderId: loggedInUserId,
+        },
+        {
+          receiverId: loggedInUserId,
+        },
+      ],
+    })
+      .sort("-createdAt")
+      .select("senderId receiverId");
+
+    const usersWeChat = [
+      ...new Set(
+        conversations.flatMap((convo) => [
+          convo.senderId.toString(),
+          convo.receiverId.toString(),
+        ])
+      ),
+    ].filter((id) => id !== loggedInUserId.toString());
+
+    console.log(usersWeChat);
+    // only show posts from users we chat
+    const posts = await Post.find({ author: { $in: usersWeChat } }).sort(
+      "-createdAt"
+    );
     return res.status(200).json(posts);
   } catch (error) {
     console.log(
@@ -20,11 +49,45 @@ export const getAllPosts = async (req, res) => {
 
 export const createPost = async (req, res) => {
   try {
+    const loggedInUserId = req?.user?._id;
+
+    const conversations = await Message.find({
+      $or: [
+        {
+          senderId: loggedInUserId,
+        },
+        {
+          receiverId: loggedInUserId,
+        },
+      ],
+    })
+      .sort("-createdAt")
+      .select("senderId receiverId");
+
+    const usersWeChat = [
+      ...new Set(
+        conversations.flatMap((convo) => [
+          convo.senderId.toString(),
+          convo.receiverId.toString(),
+        ])
+      ),
+    ].filter((id) => id !== loggedInUserId.toString());
+
+    const getSocketIdsFromUserIds = (userIds) => {
+      return userIds
+        .map((userId) => userSocketMap[userId])
+        .filter((socketId) => socketId);
+    };
+
+    const socketIdsToNotify = getSocketIdsFromUserIds(usersWeChat);
+
     const { content, image } = req.body;
     const userId = req.user?._id;
     let uploadedImageURL;
+
     if (image) {
-      uploadedImageURL = await cloudinary.uploader.upload(profilePic);
+      const uploadResult = await cloudinary.uploader.upload(image);
+      uploadedImageURL = uploadResult.secure_url;
     }
     const author = await User.findById(userId);
 
@@ -37,10 +100,19 @@ export const createPost = async (req, res) => {
       image: uploadedImageURL,
     });
     await newPost.save();
+
+    socketIdsToNotify.forEach((socketId) => {
+      if (socketId) {
+        io.to(socketId).emit("newPost", newPost);
+      }
+    });
+
+    console.log("Socket ids to notify -------", socketIdsToNotify);
+
     return res.status(201).json({ message: "Post added successfully" });
   } catch (error) {
     console.log(
-      "An internal server error occured in create POst",
+      "An internal server error occured in create Post",
       error.message
     );
     return res.status(500).json({

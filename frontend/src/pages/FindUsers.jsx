@@ -31,7 +31,7 @@ const FindUsers = () => {
     : shuffleElements(allUsers).slice(0, 20);
 
   return (
-    <div className="h-screen bg-base-200">
+    <div className="min-h-screen h-full bg-base-200">
       <div className="flex items-center justify-center pt-20 px-4">
         <div className="bg-base-100 rounded-lg shadow-lg w-full max-w-7xl h-[calc(100vh-8rem]">
           <div className="h-[80vh] rounded-lg overflow-hidden">
