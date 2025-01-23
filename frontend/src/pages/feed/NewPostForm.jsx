@@ -1,7 +1,8 @@
-import { Image, Send, X } from "lucide-react";
+import { Image, Loader, Loader2, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import toast from "react-hot-toast";
+import { usePostStore } from "../../store/usePostStore";
 
 const NewPostForm = () => {
   const [editorContent, setEditorContent] = useState("");
@@ -9,15 +10,15 @@ const NewPostForm = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const editorRef = useRef(null);
 
+  const { isCreatingNewPosts } = usePostStore();
+
   const handleImageChange = (e) => {
     e.preventDefault();
     const file = e.target.files[0];
     if (!file) return;
 
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
+    if (!file.type.startsWith("image/"))
+      return toast.error("Please select an image file");
 
     setImage(file);
     const reader = new FileReader();
@@ -43,13 +44,8 @@ const NewPostForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!editorContent.trim() && !image) {
-      toast.error("Please add some content or an image");
-      return;
-    }
-    console.log(editorContent);
-    console.log(image);
-    // Add your submit logic here
+    if (!editorContent.trim() && !image)
+      return toast.error("Please add some content or an image");
   };
 
   return (
@@ -124,7 +120,11 @@ const NewPostForm = () => {
           }`}
           onClick={() => fileInputRef.current?.click()}
         >
-          <Image size={20} />
+          {isCreatingNewPosts ? (
+            <Loader2 className="animate-spin" />
+          ) : (
+            <Image size={20} />
+          )}
         </button>
         <button
           type="submit"

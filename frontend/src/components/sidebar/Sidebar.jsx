@@ -3,10 +3,17 @@ import { useChatStore } from "../../store/useChatStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import SearchForm from "./SearchForm";
 import SidebarTop from "./SidebarTop";
+import { Loader2 } from "lucide-react";
 
 const Sidebar = () => {
-  const { users, getUsers, selectedUser, setSelectedUser, searchUsers } =
-    useChatStore();
+  const {
+    users,
+    getUsers,
+    selectedUser,
+    setSelectedUser,
+    searchUsers,
+    isUsersLoading,
+  } = useChatStore();
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
   const [searchedUser, setSearchedUser] = useState(null);
@@ -74,14 +81,22 @@ const Sidebar = () => {
           </button>
         ))}
 
-        {users.length === 0 ? (
-          <div className="text-center text-zinc-500 py-4">No Users</div>
+        {isUsersLoading ? (
+          <p className="text-center flex items-center justify-center py-10">
+            <Loader2 className="animate-spin text-center" />
+          </p>
         ) : (
-          filteredUsers.length === 0 && (
-            <div className="text-center text-zinc-500 py-4">
-              No online users
-            </div>
-          )
+          <>
+            {users.length === 0 ? (
+              <div className="text-center text-zinc-500 py-4">No Users</div>
+            ) : (
+              filteredUsers.length === 0 && (
+                <div className="text-center text-zinc-500 py-4">
+                  No online users
+                </div>
+              )
+            )}
+          </>
         )}
       </div>
     </>

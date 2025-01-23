@@ -27,11 +27,8 @@ const Feed = () => {
   const handleSave = (postId) => {
     setSavedPosts((prev) => {
       const newSaved = new Set(prev);
-      if (newSaved.has(postId)) {
-        newSaved.delete(postId);
-      } else {
-        newSaved.add(postId);
-      }
+      if (newSaved.has(postId)) newSaved.delete(postId);
+      else newSaved.add(postId);
       return newSaved;
     });
   };

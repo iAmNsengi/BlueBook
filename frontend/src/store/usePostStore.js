@@ -11,6 +11,7 @@ const BASE_URL =
 export const usePostStore = create((set, get) => ({
   socket: null,
   isGettingPosts: false,
+  isCreatingNewPost: false,
 
   posts: [],
   isFindingPosts: false,
@@ -25,6 +26,19 @@ export const usePostStore = create((set, get) => ({
       toast.error(error.response.data.message);
     } finally {
       set({ isGettingPosts: false });
+    }
+  },
+  createPost: async () => {
+    set({ isCreatingNewPost: true });
+    try {
+      const res = await axiosInstance.post("/posts/add");
+      set({ posts: [...get().posts, res.data] });
+      toast.success("Post added successfully");
+    } catch (error) {
+      console.error("Error in create Post", error);
+      return toast.error(error.response.data.message);
+    } finally {
+      set({ isCreatingNewPost: false });
     }
   },
   connectSocket: () => {
