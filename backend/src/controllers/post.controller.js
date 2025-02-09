@@ -1,5 +1,5 @@
-import cloudinary from "../lib/cloudinary.js";
-import { io, userSocketMap } from "../lib/socket.js";
+import cloudinary from "../utils/cloudinary.js";
+import { io, userSocketMap } from "../utils/socket.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
