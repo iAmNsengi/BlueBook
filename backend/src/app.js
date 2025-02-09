@@ -7,9 +7,9 @@ import cluster from "cluster";
 import os from "os";
 
 import appRoutes from "./routes/index.js";
-import { connectDB } from "./utils/db.js";
-import { app, server } from "./utils/socket.js";
-import { corsOptions } from "./utils/corsOptions.js";
+import { connectDB } from "./utils/configs/db.js";
+import { app, server } from "./utils/configs/socket.js";
+import { corsOptions } from "./utils/configs/corsOptions.js";
 import { requestsLimit } from "./utils/rateLimit.js";
 
 dotenv.config();
