@@ -4,17 +4,17 @@ const userSchema = new mongoose.Schema(
   {
     email: {
       type: String,
-      required: true,
-      unique: true,
+      required: [true, "Email field is required"],
+      unique: [true, "User with email already existed"],
     },
     fullName: {
       type: String,
-      required: true,
+      required: [true, "fullName field is required"],
     },
     password: {
       type: String,
       required: true,
-      minlength: 6,
+      minlength: [6, "password needs at least 6 characters"],
     },
     profilePic: {
       type: String,
@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+userSchema.index({ email: 1 });
 
 const User = mongoose.model("User", userSchema);
 
