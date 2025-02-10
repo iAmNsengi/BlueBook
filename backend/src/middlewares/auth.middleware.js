@@ -1,4 +1,5 @@
 import jwt from "jsonwebtoken";
+
 import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
@@ -16,16 +17,12 @@ export const isLoggedIn = catchAsync(async (req, res, next) => {
   if (!user)
     return next(new AppError("Unauthorized, you need to be logged in", 401));
 
-  redisClient.get(`blacklist:${decoded.jti}`, (err, data) => {
-    if (err)
-      return next(
-        new AppError(
-          "An internal server error occurred checking the token, try again later"
-        )
-      );
+  const blacklistKey = `blacklist:${decoded.userId}:${decoded.iat}`;
+  const tokenIsInBlacklist = await redisClient.get(blacklistKey);
 
-    if (data) return next(new AppError("Unauthorized, invalid token"));
-  });
+  if (tokenIsInBlacklist === token)
+    return next(new AppError("Unauthorized, invalid token"), 401);
+
   req.tokenExp = decoded.exp;
   req.user = user;
   next();

@@ -49,8 +49,11 @@ export const logout = catchAsync(async (req, res) => {
   const token = req.headers.authorization.split(" ")[1];
   const decoded = jwt.decode(token);
 
+  // Use a unique key for blacklisting
+  const blacklistKey = `blacklist:${decoded.userId}:${decoded.iat}`;
+
   await redisClient.setEx(
-    `blacklist:${decoded.jti}`,
+    blacklistKey,
     decoded.exp - Math.floor(Date.now() / 1000),
     token
   );
