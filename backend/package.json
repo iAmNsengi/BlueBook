@@ -28,6 +28,7 @@
     "mongoose": "^8.9.5",
     "npm": "^11.1.0",
     "regexcraft": "^1.0.20",
+    "retry": "^0.13.1",
     "socket.io": "^4.8.1",
     "validator": "^13.12.0",
     "vuga-chat-app": "file:..",

@@ -18,7 +18,7 @@ const postSchema = new mongoose.Schema(
         sender: {
           type: mongoose.Schema.Types.ObjectId,
           ref: "User",
-          required: true,
+          required: [true, "Commentor's UUID is required"],
         },
       },
       {
@@ -29,6 +29,8 @@ const postSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+postSchema.index({ author: 1, timestamps: 1 });
 
 const Post = mongoose.model("Post", postSchema);
 
