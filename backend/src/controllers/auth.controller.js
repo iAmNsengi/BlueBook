@@ -13,43 +13,22 @@ export const signup = catchAsync(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   const user = await User.create({ fullName, email, password: hashedPassword });
   user.password = undefined;
-  const token = generateToken(user._id, res);
+  const token = generateToken(user._id);
   return successResponse(res, 201, { user, token });
 });
 
-export const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const passwordIsCorrect = await bcrypt.compare(password, user.password);
-    if (!passwordIsCorrect) {
-      return res.status(400).json({ message: "Invalid credentials" });
-    }
-
-    const token = generateToken(user._id, res);
-    if (!res.getHeader("Set-Cookie")) {
-      console.log("Warning: Cookie not set during login");
-      return res
-        .status(500)
-        .json({ message: "Failed to set authentication token" });
-    }
-
-    return res.status(200).json({
-      _id: user._id,
-      fullName: user.fullName,
-      email: user.email,
-      profilePic: user.profilePic,
-    });
-  } catch (error) {
-    console.log("Error in login controller:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
+export const login = catchAsync(async (req, res, next) => {
+  validateRequestBody(req, res);
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return next(new AppError("Invalid login credentials", 400));
+  const passwordIsCorrect = await bcrypt.compare(password, user.password);
+  if (!passwordIsCorrect)
+    return next(new AppError("Invalid login credentials", 400));
+  const token = generateToken(user._id);
+  user.password = undefined;
+  return successResponse(res, 200, { user, token });
+});
 
 export const logout = (req, res) => {
   try {
