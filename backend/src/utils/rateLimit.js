@@ -1,8 +1,8 @@
 import rateLimit from "express-rate-limit";
 
 export const loginRequestsLimiter = rateLimit({
-  max: 5,
-  windowMs: 15 * 60 * 1000,
+  max: 10,
+  windowMs: 5 * 60 * 1000,
   message: {
     success: false,
     message: "Too many login attempts, try again after 15 minutes",
@@ -23,7 +23,7 @@ export const signupRequestsLimiter = rateLimit({
 });
 
 export const requestsLimit = rateLimit({
-  max: 150,
+  max: 300,
   windowMs: 15 * 60 * 1000,
   message: {
     success: false,

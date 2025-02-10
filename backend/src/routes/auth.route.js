@@ -31,6 +31,6 @@ router.delete("/delete-account", isLoggedIn, deleteAccount);
 
 router.post("/findUsers", isLoggedIn, findUsers);
 
-router.get("/check", isLoggedIn);
+router.get("/check/", isLoggedIn, checkAuth);
 
 export default router;

@@ -10,6 +10,7 @@ const BASE_URL =
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
+  authToken: null,
 
   isSigningUp: false,
   isLoggingIn: false,
@@ -39,9 +40,14 @@ export const useAuthStore = create((set, get) => ({
     if (data) set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data });
+      if (!res.data?.data) throw new Error("Invalid response format");
+      const { user, token } = res.data.data;
+      set({ authUser: user, authToken: token });
       await get().checkAuth();
-      if (res?.data) toast.success("Account created successfully!");
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      if (user) toast.success("Account created successfully!");
       get().connectSocket();
     } catch (error) {
       console.log("An internal server error occurred ", error);
@@ -55,26 +61,31 @@ export const useAuthStore = create((set, get) => ({
     try {
       const currentUser = get().authUser;
       await axiosInstance.post("/auth/logout");
-      set({ authUser: null });
+      set({ authUser: null, authToken: null });
+      delete axiosInstance.defaults.headers.common["Authorization"];
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
     } catch (error) {
       console.log("Error in logout", error);
-      toast.error(error.response.data.message);
+      toast.error(error.response.data.data.message);
     }
   },
 
   login: async (data) => {
     if (data) set({ isLoggingIn: true });
-    2;
     try {
       set({ authUser: null });
       const res = await axiosInstance.post("/auth/login", data);
-      if (!res?.data?._id) return toast.error("Invalid response from server");
+      if (!res.data?.data) throw new Error("Invalid response format");
+      const { user, token } = res.data.data;
 
-      set({ authUser: res.data });
+      if (!user) return toast.error("Invalid response from server");
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      set({ authUser: user, authToken: token });
       await get().checkAuth();
-      if (res?.data) toast.success(`Welcome back ${res.data.fullName} 😊`);
+      toast.success(`Welcome back ${user?.fullName} 😊`);
       get().connectSocket();
     } catch (error) {
       console.log("Error in login", error);
