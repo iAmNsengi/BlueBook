@@ -1,85 +1,32 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
+import catchAsync from "../utils/catchAsync.js";
+import AppError from "../utils/appError.js";
+import redisClient from "../utils/redis/client.js";
 
-export const isLoggedIn = async (req, res, next) => {
-  try {
-    const token = req.cookies.jwt;
+export const isLoggedIn = catchAsync(async (req, res, next) => {
+  const token = req.headers?.authorization.split(" ")[1];
 
-    if (!token) {
-      return res.status(401).json({
-        message: "Unauthorized -- No token was provided",
-      });
-    }
+  if (!token)
+    return next(new AppError("Unauthorized, you need to be logged in", 401));
 
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET);
-    } catch (jwtError) {
-      // Clear the invalid cookie
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
-        sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".onrender.com",
-        path: "/",
-      });
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-      if (jwtError.name === "TokenExpiredError") {
-        return res.status(401).json({
-          message: "Token has expired - Please login again",
-        });
-      }
+  const user = await User.findById(decoded.userId).select("-password").lean();
+  if (!user)
+    return next(new AppError("Unauthorized, you need to be logged in", 401));
 
-      return res.status(401).json({
-        message: "Unauthorized -- Invalid token",
-      });
-    }
+  redisClient.get(`blacklist:${decoded.jti}`, (err, data) => {
+    if (err)
+      return next(
+        new AppError(
+          "An internal server error occurred checking the token, try again later"
+        )
+      );
 
-    const user = await User.findById(decoded.userId).select("-password").lean();
-
-    if (!user) {
-      // Clear cookie if user not found
-      res.clearCookie("jwt", {
-        httpOnly: true,
-        secure: process.env.NODE_ENV !== "development",
-        sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-        domain:
-          process.env.NODE_ENV === "development"
-            ? "localhost"
-            : ".onrender.com",
-        path: "/",
-      });
-
-      return res.status(404).json({
-        message: "Unauthorized -- User not found",
-      });
-    }
-
-    // Add token expiration time to request for potential refresh logic
-    req.tokenExp = decoded.exp;
-    req.user = user;
-    next();
-  } catch (error) {
-    console.log(
-      "An internal server error occurred in isLoggedIn middleware",
-      error.message
-    );
-
-    // Clear cookie on server error to be safe
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-      domain:
-        process.env.NODE_ENV === "development" ? "localhost" : ".onrender.com",
-      path: "/",
-    });
-
-    return res.status(500).json({
-      message: "An internal server error occurred - Please try again",
-    });
-  }
-};
+    if (data) return next(new AppError("Unauthorized, invalid token"));
+  });
+  req.tokenExp = decoded.exp;
+  req.user = user;
+  next();
+});

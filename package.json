@@ -17,5 +17,8 @@
     "url": "https://github.com/iAmNsengi/web-sockets/issues"
   },
   "homepage": "https://github.com/iAmNsengi/web-sockets#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "redis": "^4.7.0"
+  }
 }

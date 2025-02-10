@@ -1,10 +1,10 @@
+import os from "os";
+import cluster from "cluster";
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
 import compression from "compression";
-import cluster from "cluster";
-import os from "os";
 
 import appRoutes from "./routes/index.js";
 import { connectDB } from "./utils/configs/db.js";
@@ -12,6 +12,7 @@ import { app, server } from "./utils/configs/socket.js";
 import { corsOptions } from "./utils/configs/corsOptions.js";
 import { requestsLimit } from "./utils/rateLimit.js";
 import { errorResponse } from "./utils/responseHandlers.js";
+import { initializeRedis } from "./utils/redis/client.js";
 
 dotenv.config();
 
@@ -19,9 +20,7 @@ if (cluster.isPrimary) {
   const numCPUs = os.cpus().length;
   console.log(`Master ${process.pid} is running`);
 
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+  for (let i = 0; i < numCPUs; i++) cluster.fork();
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died`);
@@ -42,6 +41,9 @@ if (cluster.isPrimary) {
   app.use(requestsLimit);
   app.use(appRoutes);
   app.use(errorResponse);
+
+  // Initialize Redis connection
+  initializeRedis();
 
   const PORT = process.env.PORT;
   server.listen(PORT, () => {

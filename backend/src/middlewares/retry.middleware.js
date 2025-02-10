@@ -11,7 +11,7 @@ export const retryMiddleware = (
       try {
         await operationFn(req, res, next);
       } catch (err) {
-        if (operation.retry(err)) {
+        if (operation.retry(err)) { 
           console.log(`Retrying operation, attempt number: ${currentAttempt}`);
           return;
         }

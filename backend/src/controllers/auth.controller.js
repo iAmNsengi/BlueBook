@@ -1,4 +1,5 @@
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
 import User from "../models/user.model.js";
 import cloudinary from "../utils/configs/cloudinary.js";
@@ -8,6 +9,7 @@ import validateRequestBody from "../utils/validateRequestBody.js";
 import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
+import redisClient from "../utils/redis/client.js";
 
 export const signup = retryMiddleware(
   catchAsync(async (req, res, next) => {
@@ -22,6 +24,7 @@ export const signup = retryMiddleware(
     });
     user.password = undefined;
     const token = generateToken(user._id);
+    redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 201, { user, token });
   })
 );
@@ -37,25 +40,22 @@ export const login = retryMiddleware(
       return next(new AppError("Invalid login credentials", 400));
     const token = generateToken(user._id);
     user.password = undefined;
+    redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 200, { user, token });
   })
 );
 
-export const logout = (req, res) => {
-  try {
-    res.clearCookie("jwt", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV !== "development",
-      sameSite: process.env.NODE_ENV === "development" ? "Lax" : "None",
-      path: "/",
-      ...(process.env.NODE_ENV === "development" && { domain: "localhost" }),
-    });
-    return res.status(200).json({ message: "Logged out successfully!" });
-  } catch (error) {
-    console.log("Error in logout controller:", error.message);
-    return res.status(500).json({ message: "Internal Server Error" });
-  }
-};
+export const logout = catchAsync(async (req, res) => {
+  const token = req.headers.authorization.split(" ")[1];
+  const decoded = jwt.decode(token);
+
+  await redisClient.setEx(
+    `blacklist:${decoded.jti}`,
+    decoded.exp - Math.floor(Date.now() / 1000),
+    token
+  );
+  return successResponse(res, 200, "Logged out successfully");
+});
 
 export const updateProfile = async (req, res) => {
   try {
