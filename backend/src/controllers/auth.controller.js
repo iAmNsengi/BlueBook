@@ -1,10 +1,12 @@
-import { generateToken } from "../utils/auth/generateToken.js";
-import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+
+import User from "../models/user.model.js";
 import cloudinary from "../utils/configs/cloudinary.js";
 import catchAsync from "../utils/catchAsync.js";
-import { successResponse } from "../utils/responseHandlers.js";
+import AppError from "../utils/appError.js";
 import validateRequestBody from "../utils/validateRequestBody.js";
+import { successResponse } from "../utils/responseHandlers.js";
+import { generateToken } from "../utils/auth/generateToken.js";
 
 export const signup = catchAsync(async (req, res, next) => {
   validateRequestBody(req, res);

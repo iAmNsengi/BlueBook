@@ -15,6 +15,7 @@ import {
   signupRequestsLimiter,
 } from "../utils/rateLimit.js";
 import { validateSignupRequest } from "../utils/validators/signup.request.validator.js";
+import loginRequestBodyValidator from "../utils/validators/login.request.validator.js";
 
 const router = express.Router();
 
@@ -22,7 +23,7 @@ router.use("/signup", signupRequestsLimiter);
 router.post("/signup", validateSignupRequest, signup);
 
 router.use("/login", loginRequestsLimiter);
-router.post("/login", login);
+router.post("/login",loginRequestBodyValidator, login);
 
 router.post("/logout", logout);
 router.put("/update-profile", isLoggedIn, updateProfile);
