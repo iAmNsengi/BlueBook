@@ -5,9 +5,9 @@ const postSchema = new mongoose.Schema(
     author: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      required: [true, "User matching id is required"],
     },
-    authorName: { type: String, required: true },
+    authorName: { type: String, required: [true, "author name is required"] },
     content: {
       type: String,
       required: false,

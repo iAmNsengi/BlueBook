@@ -14,11 +14,12 @@ import {
   loginRequestsLimiter,
   signupRequestsLimiter,
 } from "../utils/rateLimit.js";
+import { validateSignupRequest } from "../utils/validators/signup.request.validator.js";
 
 const router = express.Router();
 
 router.use("/signup", signupRequestsLimiter);
-router.post("/signup", signup);
+router.post("/signup", validateSignupRequest, signup);
 
 router.use("/login", loginRequestsLimiter);
 router.post("/login", login);

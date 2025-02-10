@@ -2,40 +2,20 @@ import { generateToken } from "../utils/auth/generateToken.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../utils/configs/cloudinary.js";
+import catchAsync from "../utils/catchAsync.js";
+import { successResponse } from "../utils/responseHandlers.js";
+import validateRequestBody from "../utils/validateRequestBody.js";
 
-export const signup = async (req, res) => {
+export const signup = catchAsync(async (req, res, next) => {
+  validateRequestBody(req, res);
   const { fullName, email, password } = req.body;
-
-  try {
-    const userExists = await User.findOne({ email });
-    if (userExists)
-      return res
-        .status(400)
-        .json({ message: "User with given email already exists!" });
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-    const newUser = new User({ fullName, email, password: hashedPassword });
-
-    if (newUser) {
-      await newUser.save();
-
-      generateToken(newUser._id, res);
-
-      return res.status(201).json({
-        _id: newUser._id,
-        fullName: newUser.fullName,
-        email: newUser.email,
-        profilePic: newUser.profilePic,
-      });
-    } else return res.status(400).json({ message: "Invalid User data" });
-  } catch (error) {
-    console.log("Error in signup controller", error.message);
-    return res
-      .status(500)
-      .json({ message: `Internal Server Error, ${error.message}` });
-  }
-};
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const user = await User.create({ fullName, email, password: hashedPassword });
+  user.password = undefined;
+  const token = generateToken(newUser._id, res);
+  return successResponse(res, 201, { user, token });
+});
 
 export const login = async (req, res) => {
   try {

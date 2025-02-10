@@ -11,6 +11,7 @@ import { connectDB } from "./utils/configs/db.js";
 import { app, server } from "./utils/configs/socket.js";
 import { corsOptions } from "./utils/configs/corsOptions.js";
 import { requestsLimit } from "./utils/rateLimit.js";
+import { errorResponse } from "./utils/responseHandlers.js";
 
 dotenv.config();
 
@@ -40,6 +41,7 @@ if (cluster.isPrimary) {
 
   app.use(requestsLimit);
   app.use(appRoutes);
+  app.use(errorResponse);
 
   const PORT = process.env.PORT;
   server.listen(PORT, () => {

@@ -23,7 +23,7 @@ export const validateSignupRequest = [
     .trim()
     .notEmpty()
     .withMessage("Password field is required")
-    .matches(/^(?=*.[0-9])(?=*.[a-z])(?=*.[A-Z])(?=*.[!@#$%&*_]).{6,}$/)
+    .matches(/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%&*_]).{6,}$/)
     .withMessage(
       "Password should have at least 6 characters, one number, one uppercase letter, one special character and allowed characters are: !@#$%&*_"
     ),
@@ -32,8 +32,8 @@ export const validateSignupRequest = [
     .trim()
     .notEmpty()
     .withMessage("fullName field is required")
-    .matches(/^(A-Za-z)+( [A-Za-z]+)*$/)
+    .matches(/^[A-Za-z]{3,} [A-Za-z]{3,}$/)
     .withMessage(
-      "fullName should have a space between and no number or special character"
+      "fullName should have a space between names and no number or special character"
     ),
 ];
