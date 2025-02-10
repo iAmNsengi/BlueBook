@@ -3,7 +3,7 @@ import redis from "redis";
 const redisClient = redis.createClient({
   url:
     process.env.NODE_ENV === "development"
-      ? "localhost:6379"
+      ? "redis://localhost:6379"
       : process.env.REDIS_URL,
 });
 
