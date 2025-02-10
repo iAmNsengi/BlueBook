@@ -1,9 +1,10 @@
 import redis from "redis";
 
 const redisClient = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  //   password: process.env.REDIS_PASSWORD || undefined,
+  url:
+    process.env.NODE_ENV === "development"
+      ? "localhost:6379"
+      : process.env.REDIS_URL,
 });
 
 redisClient.on("error", (error) => console.log("Redis error: ", error));
