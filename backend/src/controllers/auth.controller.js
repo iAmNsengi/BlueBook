@@ -13,7 +13,7 @@ export const signup = catchAsync(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(password, salt);
   const user = await User.create({ fullName, email, password: hashedPassword });
   user.password = undefined;
-  const token = generateToken(newUser._id, res);
+  const token = generateToken(user._id, res);
   return successResponse(res, 201, { user, token });
 });
 
