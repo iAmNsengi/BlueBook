@@ -45,7 +45,7 @@ export const login = retryMiddleware(
   })
 );
 
-export const logout = catchAsync(async (req, res) => {
+export const logout = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   const decoded = jwt.decode(token);
 
@@ -59,7 +59,7 @@ export const logout = catchAsync(async (req, res) => {
   return successResponse(res, 200, "Logged out successfully");
 });
 
-export const updateProfile = catchAsync(async (req, res) => {
+export const updateProfile = catchAsync(async (req, res, next) => {
   const { profilePic } = req.body;
   const userId = req.user._id;
   if (!profilePic)
@@ -75,7 +75,7 @@ export const updateProfile = catchAsync(async (req, res) => {
   return successResponse(res, 200, updatedUser);
 });
 
-export const findUsers = catchAsync(async (req, res) => {
+export const findUsers = catchAsync(async (req, res, next) => {
   const { search } = req.body;
   const users = await User.find({
     fullName: { $regex: search, $options: "i" },
@@ -84,12 +84,12 @@ export const findUsers = catchAsync(async (req, res) => {
   return successResponse(res, 200, users);
 });
 
-export const deleteAccount = catchAsync(async (req, res) => {
+export const deleteAccount = catchAsync(async (req, res, next) => {
   const userId = req.user._id;
   await User.findByIdAndDelete(userId);
   return successResponse(res, 200, { message: "Account deleted successfully" });
 });
 
-export const checkAuth = catchAsync((req, res) =>
+export const checkAuth = catchAsync((req, res, next) =>
   res.status(200).json(req.user)
 );

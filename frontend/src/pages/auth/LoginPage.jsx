@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../../components/AuthImagePattern";
 import toast from "react-hot-toast";
+import GoogleIcon from "../../components/icons/GoogleIcon";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -117,6 +118,13 @@ const LoginPage = () => {
               </Link>
             </p>
           </div>
+          <button
+            type="submit"
+            className="btn btn-secondary w-full"
+            disabled={isLoggingIn}
+          >
+            <GoogleIcon /> Continue with Google
+          </button>
         </div>
       </div>
 
