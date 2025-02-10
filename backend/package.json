@@ -14,6 +14,7 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.5.1",
+    "cluster": "^0.7.7",
     "compression": "^1.7.5",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -27,6 +28,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
     "npm": "^11.1.0",
+    "redis": "^4.7.0",
     "regexcraft": "^1.0.20",
     "retry": "^0.13.1",
     "socket.io": "^4.8.1",
