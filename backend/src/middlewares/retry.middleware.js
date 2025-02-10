@@ -1,6 +1,9 @@
 import retry from "retry";
 
-export const retryMiddleware = (operationFn, options = {}) => {
+export const retryMiddleware = (
+  operationFn,
+  options = { retries: 3, minTimeout: 1000, factor: 2 }
+) => {
   return async (req, res, next) => {
     const operation = retry.operation(options);
 

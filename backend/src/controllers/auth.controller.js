@@ -7,30 +7,39 @@ import AppError from "../utils/appError.js";
 import validateRequestBody from "../utils/validateRequestBody.js";
 import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
+import { retryMiddleware } from "../middlewares/retry.middleware.js";
 
-export const signup = catchAsync(async (req, res, next) => {
-  validateRequestBody(req, res);
-  const { fullName, email, password } = req.body;
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
-  const user = await User.create({ fullName, email, password: hashedPassword });
-  user.password = undefined;
-  const token = generateToken(user._id);
-  return successResponse(res, 201, { user, token });
-});
+export const signup = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    validateRequestBody(req, res);
+    const { fullName, email, password } = req.body;
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    const user = await User.create({
+      fullName,
+      email,
+      password: hashedPassword,
+    });
+    user.password = undefined;
+    const token = generateToken(user._id);
+    return successResponse(res, 201, { user, token });
+  })
+);
 
-export const login = catchAsync(async (req, res, next) => {
-  validateRequestBody(req, res);
-  const { email, password } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return next(new AppError("Invalid login credentials", 400));
-  const passwordIsCorrect = await bcrypt.compare(password, user.password);
-  if (!passwordIsCorrect)
-    return next(new AppError("Invalid login credentials", 400));
-  const token = generateToken(user._id);
-  user.password = undefined;
-  return successResponse(res, 200, { user, token });
-});
+export const login = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    validateRequestBody(req, res);
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return next(new AppError("Invalid login credentials", 400));
+    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+    if (!passwordIsCorrect)
+      return next(new AppError("Invalid login credentials", 400));
+    const token = generateToken(user._id);
+    user.password = undefined;
+    return successResponse(res, 200, { user, token });
+  })
+);
 
 export const logout = (req, res) => {
   try {
