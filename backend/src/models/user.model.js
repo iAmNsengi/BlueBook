@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       select: false,
     },
+    interest: [{ type: mongoose.Schema.Types.ObjectId, ref: "Interests" }],
     profilePic: {
       type: String,
       default: "",

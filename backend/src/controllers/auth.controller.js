@@ -11,7 +11,7 @@ import validateRequestBody from "../utils/validateRequestBody.js";
 import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
-import redisClient from "../utils/redis/client.js";
+import redisClient from "../utils/redis/redisClient.js";
 
 export const signup = retryMiddleware(
   catchAsync(async (req, res, next) => {
@@ -35,12 +35,13 @@ export const login = retryMiddleware(
   catchAsync(async (req, res, next) => {
     validateRequestBody(req, res);
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new AppError("Invalid login credentials", 400));
-    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+    const passwordIsCorrect = await bcrypt.compare(password, user?.password);
     if (!passwordIsCorrect)
       return next(new AppError("Invalid login credentials", 400));
     const token = generateToken(user._id);
+    console.log(token);
     user.password = undefined;
     redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 200, { user, token });
