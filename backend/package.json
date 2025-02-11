@@ -26,7 +26,6 @@
     "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
-    "npm": "^11.1.0",
     "regexcraft": "^1.0.20",
     "retry": "^0.13.1",
     "socket.io": "^4.8.1",
