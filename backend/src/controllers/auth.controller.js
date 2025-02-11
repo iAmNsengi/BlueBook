@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import pkg from "google-auth-library";
+const { OAuth2Client } = pkg;
 
 import User from "../models/user.model.js";
 import cloudinary from "../utils/configs/cloudinary.js";
@@ -42,6 +44,32 @@ export const login = retryMiddleware(
     user.password = undefined;
     redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 200, { user, token });
+  })
+);
+
+export const googleAuth = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    validateRequestBody(req, res);
+    const client = new OAuth2Client();
+    const { credential, client_id } = req.body;
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: client_id,
+    });
+    const payload = ticket.getPayload();
+    const { name, given_name, email } = payload;
+    const userWithEmailExists = await User.findOne({ email });
+    if (userWithEmailExists) {
+      const token = generateToken(userWithEmailExists?._id);
+      return successResponse(res, 200, { user: userWithEmailExists, token });
+    }
+    const newUser = await User.create({
+      fullName: `${given_name} ${name}`,
+      email,
+      source: "google",
+    });
+    const token = generateToken(newUser._id);
+    return successResponse(res, 201, { user: newUser, token });
   })
 );
 
