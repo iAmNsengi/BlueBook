@@ -88,8 +88,17 @@ const LoginPage = () => {
                   }
                   type="button"
                 >
-                  {showPassword ? <EyeClosed /> : <Eye />}{" "}
+                  {showPassword && formData?.password !== "" ? (
+                    <EyeClosed />
+                  ) : (
+                    <Eye />
+                  )}{" "}
                 </button>
+              </div>
+              <div className="py-2 text-right px-3 underline">
+                <span className="label-text font-medium">
+                  <Link to={"/"}>Forgot Password?</Link>
+                </span>
               </div>
             </div>
             <button
