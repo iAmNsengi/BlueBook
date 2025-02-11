@@ -29,7 +29,6 @@ router.post("/login", loginRequestBodyValidator, login);
 router.post("/google-auth", googleAuth);
 
 router.post("/logout", logout);
-router.put("/update-profile", isLoggedIn, updateProfile);
 router.delete("/delete-account", isLoggedIn, deleteAccount);
 
 router.post("/findUsers", isLoggedIn, findUsers);

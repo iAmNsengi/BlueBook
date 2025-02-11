@@ -1,11 +1,9 @@
 import express from "express";
-import { isLoggedIn } from "../middlewares/auth.middleware.js";
 import { createPost, getAllPosts } from "../controllers/post.controller.js";
 
 const router = express.Router();
 
-router.get("/", isLoggedIn, getAllPosts);
-
-router.post("/add", isLoggedIn, createPost);
+router.get("/", getAllPosts);
+router.post("/add", createPost);
 
 export default router;
