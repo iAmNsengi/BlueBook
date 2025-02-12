@@ -26,7 +26,7 @@ router.post("/signup", validateSignupRequest, signup);
 router.use("/login", loginRequestsLimiter);
 router.post("/login", loginRequestBodyValidator, login);
 
-router.post("/google-auth", googleAuth);
+router.post("/google", googleAuth);
 
 router.post("/logout", logout);
 router.delete("/delete-account", isLoggedIn, deleteAccount);

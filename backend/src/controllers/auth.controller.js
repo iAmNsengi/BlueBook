@@ -50,9 +50,12 @@ export const login = retryMiddleware(
 
 export const googleAuth = retryMiddleware(
   catchAsync(async (req, res, next) => {
-    validateRequestBody(req, res);
+    // validateRequestBody(req, res);
+
     const client = new OAuth2Client();
     const { credential, client_id } = req.body;
+    console.log(req.body, "req body from google -------------");
+
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: client_id,
