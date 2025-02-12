@@ -14,6 +14,7 @@ const passwordResetsSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+passwordResetsSchema.index({ user: 1 });
 
 const PasswordResets = mongoose.model("PasswordResets", passwordResetsSchema);
 
