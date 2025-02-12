@@ -12,7 +12,7 @@ import { app, server } from "./utils/configs/socket.js";
 import { corsOptions } from "./utils/configs/corsOptions.js";
 import { requestsLimit } from "./utils/rateLimit.js";
 import { errorResponse } from "./utils/responseHandlers.js";
-import { initializeRedis } from "./utils/redis/client.js";
+import { initializeRedis } from "./utils/redis/redisClient.js";
 
 dotenv.config();
 

@@ -3,7 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
-import redisClient from "../utils/redis/client.js";
+import redisClient from "../utils/redis/redisClient.js";
 
 export const isLoggedIn = catchAsync(async (req, res, next) => {
   const token = req.headers?.authorization.split(" ")[1];

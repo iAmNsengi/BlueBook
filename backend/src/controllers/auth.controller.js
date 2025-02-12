@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import pkg from "google-auth-library";
+const { OAuth2Client } = pkg;
 
 import User from "../models/user.model.js";
 import cloudinary from "../utils/configs/cloudinary.js";
@@ -9,7 +11,7 @@ import validateRequestBody from "../utils/validateRequestBody.js";
 import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
-import redisClient from "../utils/redis/client.js";
+import redisClient from "../utils/redis/redisClient.js";
 
 export const signup = retryMiddleware(
   catchAsync(async (req, res, next) => {
@@ -33,23 +35,52 @@ export const login = retryMiddleware(
   catchAsync(async (req, res, next) => {
     validateRequestBody(req, res);
     const { email, password } = req.body;
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).select("+password");
     if (!user) return next(new AppError("Invalid login credentials", 400));
-    const passwordIsCorrect = await bcrypt.compare(password, user.password);
+    const passwordIsCorrect = await bcrypt.compare(password, user?.password);
     if (!passwordIsCorrect)
       return next(new AppError("Invalid login credentials", 400));
     const token = generateToken(user._id);
+    console.log(token);
     user.password = undefined;
     redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 200, { user, token });
   })
 );
 
-export const logout = catchAsync(async (req, res) => {
+export const googleAuth = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    // validateRequestBody(req, res);
+
+    const client = new OAuth2Client();
+    const { credential, client_id } = req.body;
+    console.log(req.body, "req body from google -------------");
+
+    const ticket = await client.verifyIdToken({
+      idToken: credential,
+      audience: client_id,
+    });
+    const payload = ticket.getPayload();
+    const { name, given_name, email } = payload;
+    const userWithEmailExists = await User.findOne({ email });
+    if (userWithEmailExists) {
+      const token = generateToken(userWithEmailExists?._id);
+      return successResponse(res, 200, { user: userWithEmailExists, token });
+    }
+    const newUser = await User.create({
+      fullName: `${given_name} ${name}`,
+      email,
+      source: "google",
+    });
+    const token = generateToken(newUser._id);
+    return successResponse(res, 201, { user: newUser, token });
+  })
+);
+
+export const logout = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   const decoded = jwt.decode(token);
 
-  // Use a unique key for blacklisting
   const blacklistKey = `blacklist:${decoded.userId}:${decoded.iat}`;
 
   await redisClient.setEx(
@@ -60,69 +91,37 @@ export const logout = catchAsync(async (req, res) => {
   return successResponse(res, 200, "Logged out successfully");
 });
 
-export const updateProfile = async (req, res) => {
-  try {
-    const { profilePic } = req.body;
-    const userId = req.user._id;
-    if (!profilePic)
-      return res.status(400).json({ message: "Profile picture is required!" });
-    const uploadResponse = await cloudinary.uploader.upload(profilePic);
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      {
-        profilePic: uploadResponse.secure_url,
-      },
-      { new: true }
-    );
-    return res.status(200).json(updatedUser);
-  } catch (error) {
-    console.log("An internal server error occurred", error.message);
-    return res
-      .status(500)
-      .json({ message: `An internal server error occurred, ${error.message}` });
-  }
-};
+export const updateProfile = catchAsync(async (req, res, next) => {
+  const { profilePic } = req.body;
+  const userId = req.user._id;
+  if (!profilePic)
+    return res.status(400).json({ message: "Profile picture is required!" });
+  const uploadResponse = await cloudinary.uploader.upload(profilePic);
+  const updatedUser = await User.findByIdAndUpdate(
+    userId,
+    {
+      profilePic: uploadResponse.secure_url,
+    },
+    { new: true }
+  );
+  return successResponse(res, 200, updatedUser);
+});
 
-export const findUsers = async (req, res) => {
-  try {
-    const { search } = req.body;
-    const { user } = req;
+export const findUsers = catchAsync(async (req, res, next) => {
+  const { search } = req.body;
+  const users = await User.find({
+    fullName: { $regex: search, $options: "i" },
+    _id: { $ne: req?.user._id },
+  });
+  return successResponse(res, 200, users);
+});
 
-    const users = await User.find({
-      fullName: { $regex: search, $options: "i" },
-      _id: { $ne: user._id },
-    });
-    return res.status(200).json(users);
-  } catch (error) {
-    console.error("Error in findusers", error);
-    return res
-      .status(500)
-      .json({ message: `Error in findUsers, ${error.message}` });
-  }
-};
+export const deleteAccount = catchAsync(async (req, res, next) => {
+  const userId = req.user._id;
+  await User.findByIdAndDelete(userId);
+  return successResponse(res, 200, { message: "Account deleted successfully" });
+});
 
-export const deleteAccount = async (req, res) => {
-  try {
-    const userId = req.user._id;
-    const deletedUser = await User.findByIdAndDelete(userId);
-    console.log(deleteAccount);
-
-    return res.status(200).json({ message: "User deleted successfully!" });
-  } catch (error) {
-    console.error("An error occurred in deleteAccount", error);
-    return res
-      .status(500)
-      .json({ message: `An internal server error occurred, ${error.message}` });
-  }
-};
-
-export const checkAuth = (req, res) => {
-  try {
-    return res.status(200).json(req.user);
-  } catch (error) {
-    console.log("An internal server error occurred", error.message);
-    return res.status(500).json({
-      message: `An internal server error occurred, ${error.message}`,
-    });
-  }
-};
+export const checkAuth = catchAsync((req, res, next) =>
+  res.status(200).json(req.user)
+);

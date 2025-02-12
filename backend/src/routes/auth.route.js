@@ -4,6 +4,7 @@ import {
   checkAuth,
   deleteAccount,
   findUsers,
+  googleAuth,
   login,
   logout,
   signup,
@@ -25,8 +26,9 @@ router.post("/signup", validateSignupRequest, signup);
 router.use("/login", loginRequestsLimiter);
 router.post("/login", loginRequestBodyValidator, login);
 
+router.post("/google", googleAuth);
+
 router.post("/logout", logout);
-router.put("/update-profile", isLoggedIn, updateProfile);
 router.delete("/delete-account", isLoggedIn, deleteAccount);
 
 router.post("/findUsers", isLoggedIn, findUsers);

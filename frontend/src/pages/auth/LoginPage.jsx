@@ -12,6 +12,7 @@ import {
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../../components/AuthImagePattern";
 import toast from "react-hot-toast";
+import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -22,6 +23,8 @@ const LoginPage = () => {
     e.preventDefault();
     if (formData.password === "" || formData.email.trim() === "")
       return toast.error("All fields are required!");
+    console.log(formData);
+
     login(formData);
   };
 
@@ -87,8 +90,17 @@ const LoginPage = () => {
                   }
                   type="button"
                 >
-                  {showPassword ? <EyeClosed /> : <Eye />}{" "}
+                  {showPassword && formData?.password !== "" ? (
+                    <EyeClosed />
+                  ) : (
+                    <Eye />
+                  )}{" "}
                 </button>
+              </div>
+              <div className="py-2 text-right px-3 underline">
+                <span className="label-text font-medium">
+                  <Link to={"/"}>Forgot Password?</Link>
+                </span>
               </div>
             </div>
             <button
@@ -117,6 +129,7 @@ const LoginPage = () => {
               </Link>
             </p>
           </div>
+          <GoogleAuth />
         </div>
       </div>
 

@@ -14,6 +14,7 @@ import { Link } from "react-router-dom";
 import AuthImagePattern from "../../components/AuthImagePattern";
 import RegexCraft from "regexcraft";
 import toast from "react-hot-toast";
+import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
@@ -189,6 +190,7 @@ const SignUpPage = () => {
               </Link>
             </p>
           </div>
+          <GoogleAuth />
         </div>
       </div>
 
