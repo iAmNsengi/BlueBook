@@ -99,7 +99,7 @@ const LoginPage = () => {
               </div>
               <div className="py-2 text-right px-3 underline">
                 <span className="label-text font-medium">
-                  <Link to={"/"}>Forgot Password?</Link>
+                  <Link to={"/forgot-password"}>Forgot Password?</Link>
                 </span>
               </div>
             </div>

@@ -51,11 +51,8 @@ export const login = retryMiddleware(
 export const googleAuth = retryMiddleware(
   catchAsync(async (req, res, next) => {
     // validateRequestBody(req, res);
-
     const client = new OAuth2Client();
     const { credential, client_id } = req.body;
-    console.log(req.body, "req body from google -------------");
-
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: client_id,
@@ -90,6 +87,14 @@ export const logout = catchAsync(async (req, res, next) => {
   );
   return successResponse(res, 200, "Logged out successfully");
 });
+
+export const forgotPassword = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    // validateRequestBody(req, res);
+    const { email } = req.body;
+    
+  })
+);
 
 export const updateProfile = catchAsync(async (req, res, next) => {
   const { profilePic } = req.body;

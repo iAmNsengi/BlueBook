@@ -14,6 +14,7 @@ import FindUsers from "./pages/FindUsers";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import Loader from "./components/Loader/Loader";
+import ForgotPassword from "./pages/auth/ForgotPassword";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -46,6 +47,7 @@ const App = () => {
           path="/login"
           element={authUser ? <Navigate to={"/"} /> : <LoginPage />}
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route
           path="/profile"

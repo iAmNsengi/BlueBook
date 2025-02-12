@@ -2,6 +2,8 @@ import { retryMiddleware } from "../middlewares/retry.middleware";
 import User from "../models/user.model";
 import catchAsync from "../utils/catchAsync";
 
+
+
 export const addUserInterests = retryMiddleware(
   catchAsync(async (req, res, next) => {
     const interests = req.body.interests;
