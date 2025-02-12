@@ -1,5 +1,5 @@
 import { Loader2 } from "lucide-react";
-import "./Loader.css"; // Import the CSS file
+import "./Loader.css";
 
 const Loader = () => {
   return (
@@ -10,7 +10,7 @@ const Loader = () => {
         <span className="bounce delay-2">G</span>
         <span className="bounce delay-3">A</span>
       </div>
-      <Loader2 className="animate-spin text-secondary size-8" />
+      <Loader2 className="animate-spin text-primary size-10" />
     </div>
   );
 };
