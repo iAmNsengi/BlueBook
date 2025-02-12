@@ -63,7 +63,7 @@ export const useChatStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/findUsers", {
         search: query,
       });
-      set({ users: res.data });
+      set({ users: res.data.data });
     } catch (error) {
       console.error("Error in searchUsers", error);
       toast.error(error.response.data.message);

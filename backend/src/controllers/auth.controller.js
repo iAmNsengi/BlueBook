@@ -175,6 +175,7 @@ export const findUsers = catchAsync(async (req, res, next) => {
     fullName: { $regex: search, $options: "i" },
     _id: { $ne: req?.user._id },
   });
+
   return successResponse(res, 200, users);
 });
 
