@@ -40,7 +40,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   loginWithGoogle: async (data) => {
-    if (data) set({ isSigningUp: true });
+    if (data) set({ isSigningUp: true, isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/google", data);
       if (!res?.data) return toast.error("Failed to signup with Google");
@@ -53,9 +53,9 @@ export const useAuthStore = create((set, get) => ({
       toast.success(`Welcome back ${user?.fullName} 😊`);
       await get().connectSocket();
     } catch (error) {
-      console.log("Error in login withgoogle", error);
+      console.log("Error in login with Google", error);
     } finally {
-      set({ isSigningUp: false });
+      set({ isSigningUp: false, isLoggingIn: false });
     }
   },
 
