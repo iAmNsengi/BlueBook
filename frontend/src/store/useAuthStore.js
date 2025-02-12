@@ -13,6 +13,8 @@ export const useAuthStore = create((set, get) => ({
   authUser: null,
   authToken: null,
 
+  isLoading: false,
+
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
@@ -27,8 +29,6 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/auth/check");
-      console.log(response, "response in checkAuth, ===============");
-
       set({ authUser: response.data });
       get().connectSocket();
     } catch (error) {
@@ -56,6 +56,24 @@ export const useAuthStore = create((set, get) => ({
       console.log("Error in login with Google", error);
     } finally {
       set({ isSigningUp: false, isLoggingIn: false });
+    }
+  },
+
+  forgotPassword: async (data) => {
+    if (data) set({ isLoading: true });
+    try {
+      await axiosInstance.post("/auth/forgot-password", data);
+      toast.success(
+        "Password reset email sent, check your email to proceed with password reset!"
+      );
+    } catch (error) {
+      if (error.status === 404)
+        return toast.error(
+          "User with email wasnot found, try creating an account"
+        );
+      toast.error(error?.message);
+    } finally {
+      set({ isLoading: false });
     }
   },
 

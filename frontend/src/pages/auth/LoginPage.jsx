@@ -23,8 +23,6 @@ const LoginPage = () => {
     e.preventDefault();
     if (formData.password === "" || formData.email.trim() === "")
       return toast.error("All fields are required!");
-    console.log(formData);
-
     login(formData);
   };
 

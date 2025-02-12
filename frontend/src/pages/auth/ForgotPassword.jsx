@@ -2,20 +2,15 @@ import { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { ArrowBigRight, Loader2, Mail, MessageSquare } from "lucide-react";
 import AuthImagePattern from "../../components/AuthImagePattern";
-import toast from "react-hot-toast";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
   const [formData, setFormData] = useState();
-  const { login, isLoggingIn } = useAuthStore();
+  const { forgotPassword, isLoading } = useAuthStore();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password === "" || formData.email.trim() === "")
-      return toast.error("All fields are required!");
-    console.log(formData);
-
-    login(formData);
+    forgotPassword({ email: formData.email });
   };
 
   return (
@@ -56,9 +51,9 @@ const ForgotPassword = () => {
             <button
               type="submit"
               className="btn btn-primary w-full"
-              disabled={isLoggingIn}
+              disabled={isLoading}
             >
-              {isLoggingIn ? (
+              {isLoading ? (
                 <>
                   <Loader2 className="size-5 animate-spin font-bold" />{" "}
                   Submitting...

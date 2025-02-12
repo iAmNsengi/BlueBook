@@ -136,11 +136,13 @@ export const resetPassword = retryMiddleware(
     const userWithEmailExists = await User.findOne({ email }).select(
       "+password"
     );
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
 
     if (!userWithEmailExists)
       return next(new AppError("User with email doesn't exist", 404));
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
     userWithEmailExists.password = hashedPassword;
     await userWithEmailExists.save();
     userWithEmailExists.password = undefined;
