@@ -13,6 +13,8 @@ export const useAuthStore = create((set, get) => ({
   authUser: null,
   authToken: null,
 
+  isLoading: false,
+
   isSigningUp: false,
   isLoggingIn: false,
   isUpdatingProfile: false,
@@ -27,8 +29,6 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/auth/check");
-      console.log(response, "response in checkAuth, ===============");
-
       set({ authUser: response.data });
       get().connectSocket();
     } catch (error) {
@@ -40,7 +40,7 @@ export const useAuthStore = create((set, get) => ({
   },
 
   loginWithGoogle: async (data) => {
-    if (data) set({ isSigningUp: true });
+    if (data) set({ isSigningUp: true, isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/google", data);
       if (!res?.data) return toast.error("Failed to signup with Google");
@@ -53,9 +53,56 @@ export const useAuthStore = create((set, get) => ({
       toast.success(`Welcome back ${user?.fullName} 😊`);
       await get().connectSocket();
     } catch (error) {
-      console.log("Error in login withgoogle", error);
+      console.log("Error in login with Google", error);
     } finally {
-      set({ isSigningUp: false });
+      set({ isSigningUp: false, isLoggingIn: false });
+    }
+  },
+
+  forgotPassword: async (data) => {
+    if (data) set({ isLoading: true });
+    try {
+      await axiosInstance.post("/auth/forgot-password", data);
+      toast.success(
+        "Password reset email sent, check your email to proceed with password reset!"
+      );
+    } catch (error) {
+      if (error.status === 404)
+        return toast.error(
+          "User with email wasnot found, try creating an account"
+        );
+      toast.error(error?.message);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  resetPassword: async (password, token) => {
+    if (password && token) set({ isLoading: true });
+    try {
+      const res = await axiosInstance.post(
+        `/auth/reset-password/${token}`,
+        password
+      );
+      if (!res?.data)
+        toast.error("Failed to reset your password, try again later");
+
+      const { user, token: loginToken } = res.data.data;
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${loginToken}`;
+      set({ authUser: user, authToken: loginToken });
+      await get().checkAuth();
+      toast.success(`Welcome back ${user?.fullName} 😊`);
+      get().connectSocket();
+    } catch (error) {
+      if (error.status === 404)
+        return toast.error(
+          "User with email wasnot found, try creating an account"
+        );
+      toast.error(error?.message);
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -88,6 +135,7 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
+      window.location.href = "/login";
     } catch (error) {
       console.log("Error in logout", error);
       toast.error(error.response.data.data.message);

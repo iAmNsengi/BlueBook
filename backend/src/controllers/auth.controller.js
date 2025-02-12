@@ -1,6 +1,7 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import pkg from "google-auth-library";
+import nodemailer from "nodemailer";
 const { OAuth2Client } = pkg;
 
 import User from "../models/user.model.js";
@@ -12,6 +13,9 @@ import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
 import redisClient from "../utils/redis/redisClient.js";
+import { sendEmail } from "../utils/emails/sendEmail.js";
+import { createResetPasswordEmailTemplate } from "../utils/emails/emailTemplates.js";
+import PasswordResets from "../models/passwordResets.model.js";
 
 export const signup = retryMiddleware(
   catchAsync(async (req, res, next) => {
@@ -51,11 +55,8 @@ export const login = retryMiddleware(
 export const googleAuth = retryMiddleware(
   catchAsync(async (req, res, next) => {
     // validateRequestBody(req, res);
-
     const client = new OAuth2Client();
     const { credential, client_id } = req.body;
-    console.log(req.body, "req body from google -------------");
-
     const ticket = await client.verifyIdToken({
       idToken: credential,
       audience: client_id,
@@ -90,6 +91,67 @@ export const logout = catchAsync(async (req, res, next) => {
   );
   return successResponse(res, 200, "Logged out successfully");
 });
+
+export const forgotPassword = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    // validateRequestBody(req, res);
+    const { email } = req.body;
+    const userWithEmailExists = await User.findOne({ email });
+    if (!userWithEmailExists)
+      return next(
+        new AppError(
+          "User with e-mail couldn't be found, consider creating an account",
+          404
+        )
+      );
+    const token = jwt.sign(
+      { email: userWithEmailExists?.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15min",
+      }
+    );
+    const resetUrl = `${
+      process.env.NODE_ENV === "development"
+        ? "http://localhost:5173"
+        : "https://vuga.onrender.com"
+    }/auth/reset-password/${token}`;
+
+    await sendEmail(
+      userWithEmailExists.email,
+      "Password Reset | Vuga ChatApp",
+      createResetPasswordEmailTemplate(userWithEmailExists?.fullName, resetUrl)
+    );
+    return successResponse(res, 200, { token });
+  })
+);
+
+export const resetPassword = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    const { email } = jwt.verify(token, process.env.JWT_SECRET);
+    if (!email) return next(new AppError("Invalid token", 400));
+    const userWithEmailExists = await User.findOne({ email }).select(
+      "+password"
+    );
+
+    if (!userWithEmailExists)
+      return next(new AppError("User with email doesn't exist", 404));
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    userWithEmailExists.password = hashedPassword;
+    await userWithEmailExists.save();
+    userWithEmailExists.password = undefined;
+    const loginToken = generateToken(userWithEmailExists._id);
+    return successResponse(res, 200, {
+      user: userWithEmailExists,
+      token: loginToken,
+    });
+  })
+);
 
 export const updateProfile = catchAsync(async (req, res, next) => {
   const { profilePic } = req.body;

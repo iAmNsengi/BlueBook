@@ -6,7 +6,6 @@ import SettingsPage from "./pages/SettingsPage";
 import ProfilePage from "./pages/ProfilePage";
 import { useAuthStore } from "./store/useAuthStore";
 import { useEffect } from "react";
-import { Loader } from "lucide-react";
 import { Toaster } from "react-hot-toast";
 import { useThemeStore } from "./store/useThemeStore";
 import Chat from "./pages/chat/Chat";
@@ -14,6 +13,9 @@ import LoginPage from "./pages/auth/LoginPage";
 import FindUsers from "./pages/FindUsers";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
+import Loader from "./components/Loader/Loader";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -23,12 +25,7 @@ const App = () => {
     checkAuth();
   }, [checkAuth]);
 
-  if (isCheckingAuth && !authUser)
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader className="size-10 animate-spin" />
-      </div>
-    );
+  if (isCheckingAuth && !authUser) return <Loader />;
 
   return (
     <div data-theme={theme}>
@@ -51,6 +48,12 @@ const App = () => {
           path="/login"
           element={authUser ? <Navigate to={"/"} /> : <LoginPage />}
         />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/auth/reset-password/:token"
+          element={authUser ? <HomePage /> : <ResetPassword />}
+        />
+
         <Route path="/settings" element={<SettingsPage />} />
         <Route
           path="/profile"

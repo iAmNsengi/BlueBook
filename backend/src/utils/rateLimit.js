@@ -32,3 +32,14 @@ export const requestsLimit = rateLimit({
   legacyHeaders: true,
   standardHeaders: true,
 });
+
+export const fiveRequestsLimit = rateLimit({
+  max: 5,
+  windowMs: 10 * 60 * 1000,
+  message: {
+    success: false,
+    message: "Too many requests, try again after 10 minutes",
+  },
+  standardHeaders: true,
+  legacyHeaders: true,
+});

@@ -4,11 +4,12 @@ import {
   checkAuth,
   deleteAccount,
   findUsers,
+  forgotPassword,
   googleAuth,
   login,
   logout,
+  resetPassword,
   signup,
-  updateProfile,
 } from "../controllers/auth.controller.js";
 import { isLoggedIn } from "../middlewares/auth.middleware.js";
 import {
@@ -30,6 +31,9 @@ router.post("/google", googleAuth);
 
 router.post("/logout", logout);
 router.delete("/delete-account", isLoggedIn, deleteAccount);
+
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password/:token", resetPassword);
 
 router.post("/findUsers", isLoggedIn, findUsers);
 
