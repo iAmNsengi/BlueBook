@@ -77,6 +77,35 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  resetPassword: async (password, token) => {
+    if (password && token) set({ isLoading: true });
+    try {
+      const res = await axiosInstance.post(
+        `/auth/reset-password/${token}`,
+        password
+      );
+      if (!res?.data)
+        toast.error("Failed to reset your password, try again later");
+
+      const { user, token: loginToken } = res.data.data;
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${loginToken}`;
+      set({ authUser: user, authToken: loginToken });
+      await get().checkAuth();
+      toast.success(`Welcome back ${user?.fullName} 😊`);
+      get().connectSocket();
+    } catch (error) {
+      if (error.status === 404)
+        return toast.error(
+          "User with email wasnot found, try creating an account"
+        );
+      toast.error(error?.message);
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   signUp: async (data) => {
     if (data) set({ isSigningUp: true });
     try {

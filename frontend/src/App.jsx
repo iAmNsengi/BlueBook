@@ -15,6 +15,7 @@ import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
 import Loader from "./components/Loader/Loader";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -48,6 +49,11 @@ const App = () => {
           element={authUser ? <Navigate to={"/"} /> : <LoginPage />}
         />
         <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/auth/reset-password/:token"
+          element={authUser ? <HomePage /> : <ResetPassword />}
+        />
+
         <Route path="/settings" element={<SettingsPage />} />
         <Route
           path="/profile"

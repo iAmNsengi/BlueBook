@@ -129,7 +129,6 @@ export const forgotPassword = retryMiddleware(
 export const resetPassword = retryMiddleware(
   catchAsync(async (req, res, next) => {
     const { token } = req.params;
-
     const { password } = req.body;
     const { email } = jwt.verify(token, process.env.JWT_SECRET);
     if (!email) return next(new AppError("Invalid token", 400));
@@ -146,7 +145,11 @@ export const resetPassword = retryMiddleware(
     userWithEmailExists.password = hashedPassword;
     await userWithEmailExists.save();
     userWithEmailExists.password = undefined;
-    return successResponse(res, 200, { user: userWithEmailExists });
+    const loginToken = generateToken(userWithEmailExists._id);
+    return successResponse(res, 200, {
+      user: userWithEmailExists,
+      token: loginToken,
+    });
   })
 );
 
