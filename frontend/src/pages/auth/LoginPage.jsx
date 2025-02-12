@@ -129,13 +129,6 @@ const LoginPage = () => {
               </Link>
             </p>
           </div>
-          {/* <button
-            type="submit"
-            className="btn btn-secondary w-full"
-            disabled={isLoggingIn}
-          >
-            <GoogleIcon /> Continue with Google
-          </button> */}
           <GoogleAuth />
         </div>
       </div>
