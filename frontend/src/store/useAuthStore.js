@@ -1,7 +1,8 @@
-import { create } from "zustand";
-import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
+import { create } from "zustand";
+
+import { axiosInstance } from "../lib/axios";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
@@ -26,6 +27,8 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const response = await axiosInstance.get("/auth/check");
+      console.log(response, "response in checkAuth, ===============");
+
       set({ authUser: response.data });
       get().connectSocket();
     } catch (error) {
@@ -33,6 +36,26 @@ export const useAuthStore = create((set, get) => ({
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
+    }
+  },
+
+  loginWithGoogle: async (data) => {
+    if (data) set({ isSigningUp: true });
+    try {
+      const res = await axiosInstance.post("/auth/google", data);
+      if (!res?.data) return toast.error("Failed to signup with Google");
+      const { token, user } = res.data.data;
+      set({ authUser: user, authToken: token });
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
+      await get().checkAuth();
+      toast.success(`Welcome back ${user?.fullName} 😊`);
+      await get().connectSocket();
+    } catch (error) {
+      console.log("Error in login withgoogle", error);
+    } finally {
+      set({ isSigningUp: false });
     }
   },
 
