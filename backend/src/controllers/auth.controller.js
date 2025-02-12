@@ -132,8 +132,6 @@ export const resetPassword = retryMiddleware(
 
     const { password } = req.body;
     const { email } = jwt.verify(token, process.env.JWT_SECRET);
-    console.log(email);
-
     if (!email) return next(new AppError("Invalid token", 400));
     const userWithEmailExists = await User.findOne({ email }).select(
       "+password"
