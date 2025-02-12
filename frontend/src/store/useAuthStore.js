@@ -135,6 +135,7 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
+      window.location.href = "/login";
     } catch (error) {
       console.log("Error in logout", error);
       toast.error(error.response.data.data.message);
