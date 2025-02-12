@@ -28,6 +28,11 @@ export const useAuthStore = create((set, get) => ({
 
   checkAuth: async () => {
     try {
+      const token = localStorage.getItem("token");
+      if (token)
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${token}`;
       const response = await axiosInstance.get("/auth/check");
       set({ authUser: response.data });
       get().connectSocket();
@@ -46,6 +51,7 @@ export const useAuthStore = create((set, get) => ({
       if (!res?.data) return toast.error("Failed to signup with Google");
       const { token, user } = res.data.data;
       set({ authUser: user, authToken: token });
+      localStorage.setItem("token", token);
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
@@ -92,6 +98,7 @@ export const useAuthStore = create((set, get) => ({
         "Authorization"
       ] = `Bearer ${loginToken}`;
       set({ authUser: user, authToken: loginToken });
+      localStorage.setItem("token", loginToken);
       await get().checkAuth();
       toast.success(`Welcome back ${user?.fullName} 😊`);
       get().connectSocket();
@@ -113,6 +120,7 @@ export const useAuthStore = create((set, get) => ({
       if (!res.data?.data) throw new Error("Invalid response format");
       const { user, token } = res.data.data;
       set({ authUser: user, authToken: token });
+      localStorage.setItem("token", token);
       await get().checkAuth();
       axiosInstance.defaults.headers.common[
         "Authorization"
@@ -135,6 +143,8 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
+
+      localStorage.setItem("token", "token");
       window.location.href = "/login";
     } catch (error) {
       console.log("Error in logout", error);
