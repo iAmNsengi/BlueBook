@@ -37,15 +37,24 @@ const Navbar = () => {
           <div className="flex items-center gap-2">
             {authUser && (
               <>
-                <Link to={"/chat"} className="btn btn-sm gap-2">
-                  <MessageCircle className="size-5 hidden sm:inline" />
+                <Link
+                  to={"/chat"}
+                  className="btn btn-sm gap-2 transition-color"
+                >
+                  <MessageCircle className="size-5" />
                   <span className="hidden sm:inline">Chats</span>
                 </Link>
-                <Link to={"/find-friends"} className="btn btn-sm gap-2">
-                  <UserSearchIcon className="size-5 hidden sm:inline" />
+                <Link
+                  to={"/find-friends"}
+                  className="btn btn-sm gap-2 transition-color"
+                >
+                  <UserSearchIcon className="size-5" />
                   <span className="hidden sm:inline">Find Users</span>
                 </Link>
-                <Link to={"/profile"} className="btn btn-sm gap-2">
+                <Link
+                  to={"/profile"}
+                  className="btn btn-sm gap-2 transition-color"
+                >
                   <User className="size-5" />
                 </Link>
               </>
@@ -63,7 +72,7 @@ const Navbar = () => {
                 onClick={logoutUser}
               >
                 <LogOut className="size-5" />
-                <span className="hidden sm:inline">Logout</span>
+                <span className="md:inline hidden">Logout</span>
               </button>
             )}
           </div>
