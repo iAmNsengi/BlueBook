@@ -29,10 +29,13 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const token = localStorage.getItem("token");
-      if (token)
-        axiosInstance.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${token}`;
+      if (!token) {
+        set({ isCheckingAuth: false, authUser: null });
+        window.location.href = "/login";
+      }
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
       const response = await axiosInstance.get("/auth/check");
       set({ authUser: response.data });
       get().connectSocket();
@@ -143,7 +146,6 @@ export const useAuthStore = create((set, get) => ({
       delete axiosInstance.defaults.headers.common["Authorization"];
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
-
       localStorage.setItem("token", "token");
       window.location.href = "/login";
     } catch (error) {
