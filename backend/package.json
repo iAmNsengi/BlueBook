@@ -28,6 +28,7 @@
     "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.5",
+    "nodemailer": "^6.10.0",
     "redis": "^4.7.0",
     "regexcraft": "^1.0.20",
     "retry": "^0.13.1",
