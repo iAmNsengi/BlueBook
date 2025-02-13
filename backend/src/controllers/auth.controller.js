@@ -54,7 +54,7 @@ export const login = retryMiddleware(
 
 export const googleAuth = retryMiddleware(
   catchAsync(async (req, res, next) => {
-    // validateRequestBody(req, res);
+    validateRequestBody(req, res);
     const client = new OAuth2Client();
     const { credential, client_id } = req.body;
     const ticket = await client.verifyIdToken({
@@ -94,7 +94,7 @@ export const logout = catchAsync(async (req, res, next) => {
 
 export const forgotPassword = retryMiddleware(
   catchAsync(async (req, res, next) => {
-    // validateRequestBody(req, res);
+    validateRequestBody(req, res);
     const { email } = req.body;
     const userWithEmailExists = await User.findOne({ email });
     if (!userWithEmailExists)
@@ -128,6 +128,7 @@ export const forgotPassword = retryMiddleware(
 
 export const resetPassword = retryMiddleware(
   catchAsync(async (req, res, next) => {
+    validateRequestBody(req, res);
     const { token } = req.params;
     const { password } = req.body;
     const { email } = jwt.verify(token, process.env.JWT_SECRET);

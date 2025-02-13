@@ -49,7 +49,7 @@ const FindUsers = () => {
                 <Search />
               </button>
             </form>
-            <div className="flex items-center flex-col px-10 pt-10 overflow-auto">
+            <div className="flex items-center flex-col px-10 pt-10 overflow-y-scroll">
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <button
