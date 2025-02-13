@@ -2,9 +2,9 @@ import { Fragment, useEffect, useRef } from "react";
 import { useChatStore } from "../store/useChatStore";
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
-import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
+import SmallLoader from "./Loader/SmallLoader";
 
 const ChatContainer = () => {
   const {
@@ -33,19 +33,13 @@ const ChatContainer = () => {
     getUsers();
   }, [messages, getUsers]);
 
-  if (isMessagesLoading)
-    return (
-      <div className="flex-1 flex flex-col overflow-auto">
-        <ChatHeader />
-        <MessageSkeleton />
-      </div>
-    );
+  if (isMessagesLoading) return <SmallLoader />;
 
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
       <div className={`flex-1 overflow-y-auto p-4 space-y-1`}>
-        {isMessagesLoading && <MessageSkeleton />}
+        {isMessagesLoading && <SmallLoader />}
         {messages.map((message, i, arr) => (
           <Fragment key={message?._id}>
             {new Date(message?.createdAt).toLocaleDateString() !==

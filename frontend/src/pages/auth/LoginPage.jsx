@@ -4,7 +4,6 @@ import {
   ArrowBigRight,
   Eye,
   EyeClosed,
-  Loader2,
   Lock,
   Mail,
   MessageSquare,
@@ -13,6 +12,7 @@ import { Link } from "react-router-dom";
 import AuthImagePattern from "../../components/AuthImagePattern";
 import toast from "react-hot-toast";
 import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
+import SmallLoader from "../../components/Loader/SmallLoader";
 
 const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -108,8 +108,7 @@ const LoginPage = () => {
             >
               {isLoggingIn ? (
                 <>
-                  <Loader2 className="size-5 animate-spin font-bold" />{" "}
-                  Submitting...
+                  <SmallLoader />
                 </>
               ) : (
                 <div className="flex items-center gap-2">

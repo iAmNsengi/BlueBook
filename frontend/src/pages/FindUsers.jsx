@@ -1,9 +1,10 @@
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useAuthStore } from "../store/useAuthStore";
 import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
 import { useNavigate } from "react-router-dom";
 import { shuffleElements } from "../lib/utils";
+import SmallLoader from "../components/Loader/SmallLoader";
 
 const FindUsers = () => {
   const { onlineUsers, allUsers, getAllUsers, isFindingAllUsers } =
@@ -86,13 +87,7 @@ const FindUsers = () => {
                 ))
               ) : (
                 <>
-                  {isFindingAllUsers ? (
-                    <p>
-                      <Loader2 className="animate-spin" />{" "}
-                    </p>
-                  ) : (
-                    <p>No users found</p>
-                  )}
+                  {isFindingAllUsers ? <SmallLoader /> : <p>No users found</p>}
                 </>
               )}
             </div>

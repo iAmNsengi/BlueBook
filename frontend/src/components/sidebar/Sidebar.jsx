@@ -3,7 +3,7 @@ import { useChatStore } from "../../store/useChatStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import SearchForm from "./SearchForm";
 import SidebarTop from "./SidebarTop";
-import { Loader2 } from "lucide-react";
+import SmallLoader from "../Loader/SmallLoader";
 
 const Sidebar = () => {
   const {
@@ -82,9 +82,7 @@ const Sidebar = () => {
         ))}
 
         {isUsersLoading ? (
-          <p className="text-center flex items-center justify-center py-10">
-            <Loader2 className="animate-spin text-center" />
-          </p>
+          <SmallLoader />
         ) : (
           <>
             {users.length === 0 ? (

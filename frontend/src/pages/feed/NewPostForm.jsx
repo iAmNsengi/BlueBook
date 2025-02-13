@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Image, Loader2, Send, X } from "lucide-react";
+import { Image, Send, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import toast from "react-hot-toast";
 import { usePostStore } from "../../store/usePostStore";
+import SmallLoader from "../../components/Loader/SmallLoader";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB limit
 
@@ -22,16 +23,12 @@ const NewPostForm = ({ onClose }) => {
     if (!file) return;
 
     // Check file type
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
-    }
+    if (!file.type.startsWith("image/"))
+      return toast.error("Please select an image file");
 
     // Check file size
-    if (file.size > MAX_FILE_SIZE) {
-      toast.error("Image size should be less than 5MB");
-      return;
-    }
+    if (file.size > MAX_FILE_SIZE)
+      return toast.error("Image size should be less than 5MB");
 
     setImage(file);
     const reader = new FileReader();
@@ -201,11 +198,7 @@ const NewPostForm = ({ onClose }) => {
             (!editorContent.trim() && !imagePreview) || isCreatingNewPost
           }
         >
-          {isCreatingNewPost ? (
-            <Loader2 className="animate-spin" />
-          ) : (
-            <Send className="mx-auto" />
-          )}
+          {isCreatingNewPost ? <SmallLoader /> : <Send className="mx-auto" />}
         </button>
       </div>
     </form>

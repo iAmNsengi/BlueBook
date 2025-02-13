@@ -4,7 +4,6 @@ import {
   ArrowBigRight,
   Eye,
   EyeClosed,
-  Loader2,
   Lock,
   Mail,
   MessageSquare,
@@ -15,6 +14,7 @@ import AuthImagePattern from "../../components/AuthImagePattern";
 import RegexCraft from "regexcraft";
 import toast from "react-hot-toast";
 import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
+import SmallLoader from "../../components/Loader/SmallLoader";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState();
@@ -175,10 +175,7 @@ const SignUpPage = () => {
               disabled={isSigningUp}
             >
               {isSigningUp ? (
-                <>
-                  <Loader2 className="size-5 animate-spin font-bold" />{" "}
-                  Submitting...
-                </>
+                <SmallLoader />
               ) : (
                 <div className="flex items-center gap-2">
                   Create Account <ArrowBigRight className="mt-1" />

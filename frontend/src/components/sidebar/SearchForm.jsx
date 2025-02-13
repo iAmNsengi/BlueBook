@@ -1,6 +1,7 @@
-import { Loader2, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { useChatStore } from "../../store/useChatStore";
 import PropTypes from "prop-types";
+import SmallLoader from "../Loader/SmallLoader";
 
 const SearchForm = ({ searchForUsers, setSearchedUser }) => {
   const { isSearchingUsers, getUsers } = useChatStore();
@@ -22,7 +23,7 @@ const SearchForm = ({ searchForUsers, setSearchedUser }) => {
       <button className="btn btn-primary rounded-none">
         {isSearchingUsers ? (
           <>
-            <Loader2 className="size-5 animate-spin font-bold" />
+            <SmallLoader />
           </>
         ) : (
           <Search />

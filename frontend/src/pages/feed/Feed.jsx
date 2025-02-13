@@ -1,11 +1,11 @@
 /* eslint-disable react/prop-types */
-import { Loader2 } from "lucide-react";
 import { useEffect, useCallback, useRef } from "react";
 import Post from "./Post";
 import Modal from "../../components/Modal";
 import NewPostForm from "./NewPostForm";
 import { useAuthStore } from "../../store/useAuthStore";
 import { usePostStore } from "../../store/usePostStore";
+import SmallLoader from "../../components/Loader/SmallLoader";
 
 const Feed = () => {
   const {
@@ -49,9 +49,7 @@ const Feed = () => {
     }
 
     return () => {
-      if (loadMoreRef.current) {
-        observer.unobserve(loadMoreRef.current);
-      }
+      if (loadMoreRef.current) observer.unobserve(loadMoreRef?.current);
     };
   }, [hasMore, isLoadingMore, isGettingPosts, loadMorePosts]);
 
@@ -102,7 +100,7 @@ const Feed = () => {
         {/* Posts Display */}
         {isGettingPosts && !posts.length ? (
           <div className="flex justify-center items-center py-10">
-            <Loader2 className="animate-spin size-20" />
+            <SmallLoader />
           </div>
         ) : !Array.isArray(posts) || posts.length === 0 ? (
           <div className="text-center py-10">
@@ -121,9 +119,7 @@ const Feed = () => {
 
             {/* Load More Trigger */}
             <div ref={loadMoreRef} className="py-4 text-center">
-              {isLoadingMore && (
-                <Loader2 className="animate-spin mx-auto size-6" />
-              )}
+              {isLoadingMore && <SmallLoader />}
               {!hasMore && posts.length > 0 && (
                 <p className="text-sm text-gray-500">No more posts to load</p>
               )}
