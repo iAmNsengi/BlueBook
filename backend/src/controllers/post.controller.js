@@ -1,8 +1,7 @@
-import cloudinary from "../utils/configs/cloudinary.js";
-import { io, userSocketMap, notifyNewPost } from "../utils/configs/socket.js";
 import Post from "../models/post.model.js";
 import Message from "../models/message.model.js";
 import mongoose from "mongoose";
+import { notifyNewPost } from "../utils/configs/socket.js";
 
 export const getAllPosts = async (req, res) => {
   try {

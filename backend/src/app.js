@@ -1,6 +1,7 @@
 import os from "os";
 import cluster from "cluster";
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import mongoSanitize from "express-mongo-sanitize";
@@ -27,17 +28,14 @@ if (cluster.isPrimary) {
     cluster.fork(); // Restart the worker
   });
 } else {
+  // Apply CORS before other middleware
+  app.use(corsOptions);
+
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
   app.use(mongoSanitize());
   app.use(compression());
-
-  app.use(corsOptions);
-  app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Credentials", "true");
-    next();
-  });
 
   app.use(requestsLimit);
   app.use(appRoutes);
@@ -46,7 +44,7 @@ if (cluster.isPrimary) {
   // Initialize Redis connection
   initializeRedis();
 
-  const PORT = process.env.PORT;
+  const PORT = process.env.PORT || 5001;
   server.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
     connectDB();
