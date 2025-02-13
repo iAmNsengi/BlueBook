@@ -94,7 +94,7 @@ export const likePost = retryMiddleware(
     const post = await Post.findById(post_id);
     if (!post) return next(new AppError("Post with given id wasn't found"));
     let isLiked = false;
-    if (post.likes.length) {
+    if (post?.likes?.length) {
       isLiked = post.likes.includes(req.user._id);
       if (isLiked)
         post.likes = post.likes.filter(

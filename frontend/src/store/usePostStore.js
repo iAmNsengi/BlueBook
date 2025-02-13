@@ -36,7 +36,7 @@ export const usePostStore = create((set, get) => ({
 
       set((state) => ({
         posts: isLoadMore ? [...state.posts, ...res.data.data] : res.data.data,
-        hasMore: res.data.data.length === 5,
+        hasMore: res?.data?.data.length === 5,
         page: currentPage + 1,
         hasLoadedInitialPosts: true,
         ...(!isLoadMore && {
