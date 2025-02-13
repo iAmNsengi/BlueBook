@@ -25,7 +25,13 @@ const postSchema = new mongoose.Schema(
         comment: { type: String },
       },
     ],
-    likes: { type: Number, default: 0 },
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: [true, "User's UUID is required"],
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -28,7 +28,6 @@ if (cluster.isPrimary) {
     cluster.fork(); // Restart the worker
   });
 } else {
-  // Apply CORS before other middleware
   app.use(corsOptions);
 
   app.use(express.json({ limit: "50mb" }));

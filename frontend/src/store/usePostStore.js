@@ -172,4 +172,30 @@ export const usePostStore = create((set, get) => ({
   setNewPostAlert: (value) => {
     set({ newPostAlert: value });
   },
+  likePost: async (postId) => {
+    try {
+      const response = await axiosInstance.post(`/posts/${postId}/like`);
+
+      if (response.data.success) {
+        set((state) => ({
+          posts: state.posts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  likes: response.data.data.isLiked
+                    ? [...post.likes, useAuthStore.getState().authUser._id]
+                    : post.likes.filter(
+                        (id) => id !== useAuthStore.getState().authUser._id
+                      ),
+                }
+              : post
+          ),
+        }));
+        return response.data.data;
+      }
+    } catch (error) {
+      console.error("Error liking post:", error);
+      toast.error("Failed to like post");
+    }
+  },
 }));

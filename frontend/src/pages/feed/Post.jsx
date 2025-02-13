@@ -1,21 +1,33 @@
 /* eslint-disable react/prop-types */
 import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
-import { useState, memo } from "react";
+import { useState, memo, useCallback } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { usePostStore } from "../../store/usePostStore";
+import { useAuthStore } from "../../store/useAuthStore";
 
 // Initialize the relativeTime plugin
 dayjs.extend(relativeTime);
 
 const Post = memo(
   ({ post }) => {
-    const [isLiked, setIsLiked] = useState(false);
+    const { authUser } = useAuthStore();
+    const { likePost } = usePostStore();
+    const [isLiked, setIsLiked] = useState(post.likes?.includes(authUser._id));
+    const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
     const [isSaved, setIsSaved] = useState(false);
 
-    const handleLike = () => {
-      setIsLiked((prev) => !prev);
-      // Here you can add your API call to update likes
-    };
+    const handleLike = useCallback(async () => {
+      try {
+        const result = await likePost(post._id);
+        if (result) {
+          setIsLiked(result.isLiked);
+          setLikesCount(result.likes);
+        }
+      } catch (error) {
+        console.error("Error handling like:", error);
+      }
+    }, [post._id, likePost]);
 
     const handleSave = () => {
       setIsSaved((prev) => !prev);
@@ -80,11 +92,16 @@ const Post = memo(
                 }`}
                 onClick={handleLike}
               >
-                <Heart
-                  className={`h-6 w-6 transition-colors duration-200 ${
-                    isLiked ? "fill-current" : ""
-                  }`}
-                />
+                <div className="flex flex-col items-center">
+                  <Heart
+                    className={`h-6 w-6 transition-colors duration-200 ${
+                      isLiked ? "fill-current" : ""
+                    }`}
+                  />
+                  {likesCount > 0 && (
+                    <span className="text-xs font-medium">{likesCount}</span>
+                  )}
+                </div>
               </button>
               <button className="btn btn-ghost btn-circle">
                 <MessageCircle className="h-6 w-6" />
@@ -111,14 +128,14 @@ const Post = memo(
     );
   },
   (prevProps, nextProps) => {
-    // Only re-render if the post content changes
     return (
-      prevProps.post.id === nextProps.post.id &&
+      prevProps.post._id === nextProps.post._id &&
       prevProps.post.content === nextProps.post.content &&
-      prevProps.post.image === nextProps.post.image
+      prevProps.post.image === nextProps.post.image &&
+      prevProps.post.likes?.length === nextProps.post.likes?.length
     );
   }
 );
 
-Post.displayName = "Post"; // For better debugging
+Post.displayName = "Post";
 export default Post;

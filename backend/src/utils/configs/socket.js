@@ -39,11 +39,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Add this helper function to emit new posts
 export const notifyNewPost = (post, usersToNotify) => {
-  console.log("Attempting to notify users:", usersToNotify);
-  console.log("Current socket map:", userSocketMap);
-
   usersToNotify.forEach((userId) => {
     if (userSocketMap[userId]) {
       console.log(`Emitting new post to user ${userId}`);
