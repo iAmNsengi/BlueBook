@@ -39,10 +39,12 @@ export const usePostStore = create((set, get) => ({
         hasMore: res.data.data.length === 5,
         page: currentPage + 1,
         hasLoadedInitialPosts: true,
-        lastViewedAt: Date.now(),
-        ...(!isLoadMore && { newPosts: [], newPostAlert: false }),
+        ...(!isLoadMore && {
+          newPosts: [],
+          newPostAlert: false,
+          lastViewedAt: Date.now(),
+        }),
       }));
-      get().connectSocket();
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error(error.response?.data?.message || "Error fetching posts");
@@ -93,13 +95,16 @@ export const usePostStore = create((set, get) => ({
     }
   },
   removeNewPostAlert: () => {
-    console.log("Removing new post alert");
-    set((state) => ({
-      newPostAlert: false,
-      posts: [...(state.newPosts || []), ...(state.posts || [])],
-      newPosts: [],
-      lastViewedAt: Date.now(),
-    }));
+    set((state) => {
+      // Merge new posts at the beginning of the posts array
+      const updatedPosts = [...(state.newPosts || []), ...(state.posts || [])];
+      return {
+        posts: updatedPosts,
+        newPosts: [],
+        newPostAlert: false,
+        lastViewedAt: Date.now(),
+      };
+    });
   },
   connectSocket: () => {
     const authUser = useAuthStore.getState().authUser;
@@ -124,16 +129,21 @@ export const usePostStore = create((set, get) => ({
       set({ socket });
     });
 
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error);
-    });
-
     socket.on("newPost", (post) => {
       console.log("Received new post:", post);
-      set((state) => ({
-        newPostAlert: true,
-        newPosts: [...(state.newPosts || []), post],
-      }));
+      set((state) => {
+        // Don't add duplicate posts
+        if (
+          state.newPosts.some((p) => p._id === post._id) ||
+          state.posts.some((p) => p._id === post._id)
+        ) {
+          return state;
+        }
+        return {
+          newPosts: [post, ...(state.newPosts || [])],
+          newPostAlert: true,
+        };
+      });
     });
 
     socket.connect();
@@ -155,6 +165,8 @@ export const usePostStore = create((set, get) => ({
       hasLoadedInitialPosts: false,
       socket: null,
       lastViewedAt: Date.now(),
+      page: 1,
+      hasMore: true,
     });
   },
   setNewPostAlert: (value) => {
