@@ -1,22 +1,16 @@
 import cloudinary from "../utils/configs/cloudinary.js";
-import { io, userSocketMap } from "../utils/configs/socket.js";
+import { io, userSocketMap, notifyNewPost } from "../utils/configs/socket.js";
 import Post from "../models/post.model.js";
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
+import mongoose from "mongoose";
 
 export const getAllPosts = async (req, res) => {
   try {
     const loggedInUserId = req?.user?._id;
 
     const conversations = await Message.find({
-      $or: [
-        {
-          senderId: loggedInUserId,
-        },
-        {
-          receiverId: loggedInUserId,
-        },
-      ],
+      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
     })
       .sort("-createdAt")
       .select("senderId receiverId");
@@ -28,91 +22,72 @@ export const getAllPosts = async (req, res) => {
           convo.receiverId.toString(),
         ])
       ),
-    ];
-    // only show posts from users we chat and mine
-    const posts = await Post.find({ author: { $in: usersWeChat } }).sort(
-      "-createdAt"
-    );
-    return res.status(200).json(posts);
+    ].map((id) => new mongoose.Types.ObjectId(id));
+
+    // Only show posts from users we chat with and our own
+    const posts = await Post.find({ author: { $in: usersWeChat } })
+      .sort("-createdAt")
+      .populate("author", "fullName profilePic");
+
+
+    return res.status(200).json({
+      success: true,
+      data: posts,
+    });
   } catch (error) {
-    console.log(
-      "An internal server error occured in getAllPosts",
-      error.message
-    );
+    console.error("Get all posts error:", error);
     return res.status(500).json({
-      message: `An internal server error occurred in getAllPosts, ${error.message}`,
+      success: false,
+      message: `An error occurred while fetching posts: ${error.message}`,
     });
   }
 };
 
 export const createPost = async (req, res) => {
   try {
-    const loggedInUserId = req?.user?._id;
+    const { content, image } = req.body;
+    const userId = req.user._id;
 
+    console.log("Creating post for user:", userId);
+
+    const newPost = await Post.create({
+      content,
+      image,
+      author: userId,
+      authorName: req.user.fullName,
+    });
+
+    // Find users who chat with the post creator
     const conversations = await Message.find({
-      $or: [
-        {
-          senderId: loggedInUserId,
-        },
-        {
-          receiverId: loggedInUserId,
-        },
-      ],
-    })
-      .sort("-createdAt")
-      .select("senderId receiverId");
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    });
 
-    const usersWeChat = [
+    console.log("Found conversations:", conversations);
+
+    const usersToNotify = [
       ...new Set(
         conversations.flatMap((convo) => [
           convo.senderId.toString(),
           convo.receiverId.toString(),
         ])
       ),
-    ].filter((id) => id !== loggedInUserId.toString());
+    ].filter((id) => id !== userId.toString());
 
-    const getSocketIdsFromUserIds = (userIds) => {
-      return userIds
-        .map((userId) => userSocketMap[userId])
-        .filter((socketId) => socketId);
-    };
+    console.log("Users to notify:", usersToNotify);
 
-    const socketIdsToNotify = getSocketIdsFromUserIds(usersWeChat);
+    // Notify connected users about the new post
+    notifyNewPost(newPost, usersToNotify);
 
-    const { content, image } = req.body;
-    const userId = req.user?._id;
-    let uploadedImageURL;
-
-    if (image) {
-      const uploadResult = await cloudinary.uploader.upload(image);
-      uploadedImageURL = uploadResult.secure_url;
-    }
-    const author = await User.findById(userId);
-
-    if (!author) return res.status(400).json({ message: "Author not found" });
-
-    const newPost = new Post({
-      author,
-      authorName: author?.fullName,
-      content: content.trim(),
-      image: uploadedImageURL,
+    res.status(201).json({
+      success: true,
+      message: "Post created successfully",
+      data: newPost,
     });
-    await newPost.save();
-
-    socketIdsToNotify.forEach((socketId) => {
-      if (socketId) {
-        io.to(socketId).emit("newPost", newPost);
-      }
-    });
-
-    return res.status(201).json(newPost);
   } catch (error) {
-    console.log(
-      "An internal server error occured in create Post",
-      error.message
-    );
-    return res.status(500).json({
-      message: `An internal server error occurred in create post, ${error.message}`,
+    console.error("Error creating post:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Error creating post",
     });
   }
 };

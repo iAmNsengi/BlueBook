@@ -1,157 +1,103 @@
-import { Bookmark, Heart, Loader2, MessageCircle, Share2 } from "lucide-react";
+/* eslint-disable react/prop-types */
+import { Loader2 } from "lucide-react";
+import { useEffect, useCallback, memo } from "react";
+import Post from "./Post";
+import Modal from "../../components/Modal";
+import NewPostForm from "./NewPostForm";
+import { useAuthStore } from "../../store/useAuthStore";
 import { usePostStore } from "../../store/usePostStore";
-import { useEffect, useState } from "react";
-import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime";
 
 const Feed = () => {
-  const { posts, getAllPosts, isGettingPosts, newPostAlert } = usePostStore();
-  const [likedPosts, setLikedPosts] = useState(new Set());
-  const [savedPosts, setSavedPosts] = useState(new Set());
+  const {
+    posts,
+    getAllPosts,
+    isGettingPosts,
+    newPostAlert,
+    removeNewPostAlert,
+    isNewPostOpen,
+    setIsNewPostOpen,
+    connectSocket,
+    disconnectSocket,
+    newPosts,
+  } = usePostStore();
+
+  const { authUser } = useAuthStore();
 
   useEffect(() => {
-    getAllPosts();
-  }, [getAllPosts]);
+    console.log("Feed mounted, getting posts");
+    if (authUser) {
+      getAllPosts();
+      connectSocket();
+    }
 
-  dayjs.extend(relativeTime);
+    return () => {
+      disconnectSocket();
+    };
+  }, [getAllPosts, connectSocket, disconnectSocket, authUser]);
 
-  const handleLike = (postId) => {
-    setLikedPosts((prev) => {
-      const newLiked = new Set(prev);
-      if (newLiked.has(postId)) newLiked.delete(postId);
-      else newLiked.add(postId);
-      return newLiked;
-    });
-  };
+  const handleCloseModal = useCallback(() => {
+    setIsNewPostOpen(false);
+  }, [setIsNewPostOpen]);
 
-  const handleSave = (postId) => {
-    setSavedPosts((prev) => {
-      const newSaved = new Set(prev);
-      if (newSaved.has(postId)) newSaved.delete(postId);
-      else newSaved.add(postId);
-      return newSaved;
-    });
-  };
+  const handleNewPostsClick = useCallback(() => {
+    console.log("Loading new posts");
+    removeNewPostAlert();
+  }, [removeNewPostAlert]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
-      {newPostAlert && (
-        <button className="btn btn-red-700 size-20">New Posts</button>
-      )}
-      {isGettingPosts ? (
-        <Loader2 className="animate-spin text-center mx-auto size-20" />
-      ) : posts.length === 0 ? (
-        <div className="text-center py-10">
-          <p className="text-lg font-medium">No posts yet</p>
-          <p className="text-sm opacity-70">Be the first to share something!</p>
-        </div>
-      ) : (
-        posts.map((post) => (
-          <div
-            key={post.id}
-            className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300"
+    <div className="relative">
+      <div className="max-w-5xl mx-auto px-4 py-6 space-y-6">
+        {/* New Post Button and New Posts Alert */}
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={() => setIsNewPostOpen(true)}
+            className="btn btn-primary"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b">
-              <div className="flex items-center gap-3">
-                <div className="avatar">
-                  <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                    <img
-                      src={post?.author?.profilePic || "/avatar.png"}
-                      alt={post?.author?.fullName}
-                      className="object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm">{post?.authorName}</h3>
-                  <p className="text-xs opacity-70">
-                    {dayjs(post?.createdAt).fromNow()}
-                  </p>
-                </div>
-              </div>
-              <button className="btn btn-ghost btn-circle">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="h-6 w-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M5 12h.01M12 12h.01M19 12h.01M6 12a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0zm7 0a1 1 0 11-2 0 1 1 0 012 0z"
-                  />
-                </svg>
-              </button>
-            </div>
+            Create New Post
+          </button>
 
-            {/* Image */}
-            {post?.image && (
-              <figure className="relative">
-                <img
-                  src={post.image}
-                  alt="Post"
-                  className="w-full object-cover max-h-[32rem]"
-                  loading="lazy"
-                />
-              </figure>
-            )}
+          {newPostAlert && (
+            <button
+              onClick={handleNewPostsClick}
+              className="btn btn-accent flex items-center gap-2 animate-bounce"
+            >
+              <span className="relative flex h-3 w-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+              </span>
+              {newPosts.length} New {newPosts.length === 1 ? "Post" : "Posts"}{" "}
+              Available
+            </button>
+          )}
+        </div>
 
-            {/* Content */}
-            {post?.content && (
-              <div className="p-4 py-10">
-                <div className="prose prose-sm max-w-none">
-                  <div dangerouslySetInnerHTML={{ __html: post.content }} />
-                </div>
-              </div>
-            )}
-
-            {/* Action Buttons */}
-            <div className="p-3 border-t">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <button
-                    className={`btn btn-ghost btn-circle ${
-                      likedPosts.has(post.id) ? "text-red-500" : ""
-                    }`}
-                    onClick={() => handleLike(post.id)}
-                  >
-                    <Heart
-                      className={`h-6 w-6 transition-colors duration-200 ${
-                        likedPosts.has(post.id) ? "fill-current" : ""
-                      }`}
-                    />
-                  </button>
-                  <button className="btn btn-ghost btn-circle">
-                    <MessageCircle className="h-6 w-6" />
-                  </button>
-                  <button className="btn btn-ghost btn-circle">
-                    <Share2 className="h-6 w-6" />
-                  </button>
-                </div>
-                <button
-                  className={`btn btn-ghost btn-circle ${
-                    savedPosts.has(post.id) ? "text-yellow-500" : ""
-                  }`}
-                  onClick={() => handleSave(post.id)}
-                >
-                  <Bookmark
-                    className={`h-6 w-6 transition-colors duration-200 ${
-                      savedPosts.has(post.id) ? "fill-current" : ""
-                    }`}
-                  />
-                </button>
-              </div>
-            </div>
+        {isGettingPosts ? (
+          <Loader2 className="animate-spin text-center mx-auto size-20" />
+        ) : !Array.isArray(posts) || posts.length === 0 ? (
+          <div className="text-center py-10">
+            <p className="text-lg font-medium">No posts yet</p>
+            <p className="text-sm opacity-70">
+              Be the first to share something!
+            </p>
           </div>
-        ))
-      )}
+        ) : (
+          <div className="space-y-6">
+            {posts.map((post) => (
+              <Post key={post._id} post={post} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <Modal
+        isOpen={isNewPostOpen}
+        onClose={handleCloseModal}
+        title="Create New Post"
+      >
+        <NewPostForm onClose={handleCloseModal} />
+      </Modal>
     </div>
   );
 };
 
-export default Feed;
+export default memo(Feed);

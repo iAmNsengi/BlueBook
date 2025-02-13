@@ -27,7 +27,8 @@ if (cluster.isPrimary) {
     cluster.fork(); // Restart the worker
   });
 } else {
-  app.use(express.json({ limit: "10kb" }));
+  app.use(express.json({ limit: "50mb" }));
+  app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
   app.use(mongoSanitize());
   app.use(compression());

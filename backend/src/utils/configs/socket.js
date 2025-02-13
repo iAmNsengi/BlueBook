@@ -29,14 +29,33 @@ io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   userSocketMap[userId] = socket.id;
 
+  // Join a room specific to this user
+  socket.join(userId);
+
   // used to broadcast the message to all connected clients
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("disconnect", () => {
     console.log("A user disconnected", socket.id);
     delete userSocketMap[userId];
+    socket.leave(userId);
     io.emit("getOnlineUsers", Object.keys(userSocketMap));
   });
 });
+
+// Add this helper function to emit new posts
+export const notifyNewPost = (post, usersToNotify) => {
+  console.log("Attempting to notify users:", usersToNotify);
+  console.log("Current socket map:", userSocketMap);
+
+  usersToNotify.forEach((userId) => {
+    if (userSocketMap[userId]) {
+      console.log(`Emitting new post to user ${userId}`);
+      io.to(userSocketMap[userId]).emit("newPost", post);
+    } else {
+      console.log(`User ${userId} not connected`);
+    }
+  });
+};
 
 export { io, app, server, userSocketMap };
