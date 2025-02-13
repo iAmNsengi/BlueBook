@@ -6,6 +6,7 @@ import NewPostForm from "./NewPostForm";
 import { useAuthStore } from "../../store/useAuthStore";
 import { usePostStore } from "../../store/usePostStore";
 import SmallLoader from "../../components/Loader/SmallLoader";
+import { ArrowBigUp } from "lucide-react";
 
 const Feed = () => {
   const {
@@ -44,9 +45,7 @@ const Feed = () => {
       { threshold: 0.5 }
     );
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
-    }
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
 
     return () => {
       if (loadMoreRef.current) observer.unobserve(loadMoreRef?.current);
@@ -54,19 +53,15 @@ const Feed = () => {
   }, [hasMore, isLoadingMore, isGettingPosts, loadMorePosts]);
 
   useEffect(() => {
-    if (authUser && !hasLoadedInitialPosts) {
-      getAllPosts();
-    }
+    if (authUser && !hasLoadedInitialPosts) getAllPosts();
   }, [getAllPosts, authUser, hasLoadedInitialPosts]);
 
   useEffect(() => {
-    if (newPosts.length > 0) {
-      setNewPostAlert(true);
-    }
+    if (newPosts.length > 0) setNewPostAlert(true);
   }, [newPosts.length, setNewPostAlert]);
 
   const handleNewPostsClick = useCallback(() => {
-    console.log("Loading new posts");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     removeNewPostAlert();
   }, [removeNewPostAlert]);
 
@@ -85,14 +80,12 @@ const Feed = () => {
           {newPostAlert && newPosts.length > 0 && (
             <button
               onClick={handleNewPostsClick}
-              className="btn btn-accent flex items-center gap-2 animate-bounce"
+              className="btn btn-accent flex items-center gap-2 animate-bounce fixed left-1/2 -translate-x-1/2 top-10 z-50"
             >
-              <span className="relative flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-accent"></span>
+              <span className="relative flex items-center">
+                <ArrowBigUp className="size-6 animate-pulse" />{" "}
               </span>
-              {newPosts.length} New {newPosts.length === 1 ? "Post" : "Posts"}{" "}
-              Available
+              {newPosts.length} New {newPosts.length === 1 ? "Post" : "Posts"}
             </button>
           )}
         </div>
