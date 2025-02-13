@@ -1,19 +1,18 @@
 import cloudinary from "../utils/configs/cloudinary.js";
 import { io, userSocketMap, notifyNewPost } from "../utils/configs/socket.js";
 import Post from "../models/post.model.js";
-import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import mongoose from "mongoose";
 
 export const getAllPosts = async (req, res) => {
   try {
-    const loggedInUserId = req?.user?._id;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 5;
+    const skip = (page - 1) * limit;
 
     const conversations = await Message.find({
-      $or: [{ senderId: loggedInUserId }, { receiverId: loggedInUserId }],
-    })
-      .sort("-createdAt")
-      .select("senderId receiverId");
+      $or: [{ senderId: req.user._id }, { receiverId: req.user._id }],
+    });
 
     const usersWeChat = [
       ...new Set(
@@ -24,21 +23,20 @@ export const getAllPosts = async (req, res) => {
       ),
     ].map((id) => new mongoose.Types.ObjectId(id));
 
-    // Only show posts from users we chat with and our own
     const posts = await Post.find({ author: { $in: usersWeChat } })
       .sort("-createdAt")
+      .skip(skip)
+      .limit(limit)
       .populate("author", "fullName profilePic");
 
-
-    return res.status(200).json({
+    res.status(200).json({
       success: true,
       data: posts,
     });
   } catch (error) {
-    console.error("Get all posts error:", error);
-    return res.status(500).json({
+    res.status(500).json({
       success: false,
-      message: `An error occurred while fetching posts: ${error.message}`,
+      message: error.message,
     });
   }
 };

@@ -16,14 +16,27 @@ import "froala-editor/css/froala_editor.pkgd.min.css";
 import Loader from "./components/Loader/Loader";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import { usePostStore } from "./store/usePostStore";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+  const { connectSocket, disconnectSocket } = usePostStore();
   const { theme } = useThemeStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  // Handle socket connection at app level
+  useEffect(() => {
+    if (authUser) {
+      connectSocket();
+    }
+
+    return () => {
+      disconnectSocket();
+    };
+  }, [authUser, connectSocket, disconnectSocket]);
 
   if (isCheckingAuth && !authUser) return <Loader />;
 

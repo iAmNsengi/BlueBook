@@ -12,33 +12,55 @@ const BASE_URL =
 export const usePostStore = create((set, get) => ({
   socket: null,
   isGettingPosts: false,
+  isLoadingMore: false,
   isCreatingNewPost: false,
   newPostAlert: false,
   isNewPostOpen: false,
-
   posts: [],
-  isFindingPosts: false,
-
   newPosts: [],
+  hasLoadedInitialPosts: false,
+  lastViewedAt: Date.now(),
+  page: 1,
+  hasMore: true,
 
-  getAllPosts: async () => {
-    set({ isGettingPosts: true });
+  getAllPosts: async (isLoadMore = false) => {
+    if (!isLoadMore) {
+      set({ isGettingPosts: !get().hasLoadedInitialPosts });
+    } else {
+      set({ isLoadingMore: true });
+    }
+
     try {
-      const res = await axiosInstance.get("/posts");
-      console.log("Fetched posts:", res.data);
-      set({
-        posts: res.data.data,
-        newPosts: [],
-        newPostAlert: false,
-      });
+      const currentPage = isLoadMore ? get().page : 1;
+      const res = await axiosInstance.get(`/posts?page=${currentPage}&limit=5`);
+
+      set((state) => ({
+        posts: isLoadMore ? [...state.posts, ...res.data.data] : res.data.data,
+        hasMore: res.data.data.length === 5,
+        page: currentPage + 1,
+        hasLoadedInitialPosts: true,
+        lastViewedAt: Date.now(),
+        ...(!isLoadMore && { newPosts: [], newPostAlert: false }),
+      }));
       get().connectSocket();
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error(error.response?.data?.message || "Error fetching posts");
     } finally {
-      set({ isGettingPosts: false });
+      set({
+        isGettingPosts: false,
+        isLoadingMore: false,
+      });
     }
   },
+
+  loadMorePosts: () => {
+    const state = get();
+    if (!state.isLoadingMore && state.hasMore) {
+      state.getAllPosts(true);
+    }
+  },
+
   createPost: async (postData) => {
     try {
       set({ isCreatingNewPost: true });
@@ -76,6 +98,7 @@ export const usePostStore = create((set, get) => ({
       newPostAlert: false,
       posts: [...(state.newPosts || []), ...(state.posts || [])],
       newPosts: [],
+      lastViewedAt: Date.now(),
     }));
   },
   connectSocket: () => {
@@ -123,5 +146,18 @@ export const usePostStore = create((set, get) => ({
       socket.disconnect();
       set({ socket: null });
     }
+  },
+  resetPostStore: () => {
+    set({
+      posts: [],
+      newPosts: [],
+      newPostAlert: false,
+      hasLoadedInitialPosts: false,
+      socket: null,
+      lastViewedAt: Date.now(),
+    });
+  },
+  setNewPostAlert: (value) => {
+    set({ newPostAlert: value });
   },
 }));

@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import { create } from "zustand";
 
 import { axiosInstance } from "../lib/axios";
+import { usePostStore } from "./usePostStore";
 
 const BASE_URL =
   import.meta.env.MODE === "development"
@@ -146,6 +147,7 @@ export const useAuthStore = create((set, get) => ({
 
       localStorage.setItem("token", "");
       window.location.href = "/login";
+      usePostStore.getState().resetPostStore();
     } catch (error) {
       console.log("Error in logout", error);
       toast.error(error.response.data.data.message);

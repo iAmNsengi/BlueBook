@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { Loader2 } from "lucide-react";
-import { useEffect, useCallback, memo } from "react";
+import { useEffect, useCallback, useRef } from "react";
 import Post from "./Post";
 import Modal from "../../components/Modal";
 import NewPostForm from "./NewPostForm";
@@ -12,32 +12,60 @@ const Feed = () => {
     posts,
     getAllPosts,
     isGettingPosts,
+    isLoadingMore,
     newPostAlert,
     removeNewPostAlert,
     isNewPostOpen,
     setIsNewPostOpen,
-    connectSocket,
-    disconnectSocket,
     newPosts,
+    hasLoadedInitialPosts,
+    setNewPostAlert,
+    loadMorePosts,
+    hasMore,
   } = usePostStore();
 
   const { authUser } = useAuthStore();
 
+  const loadMoreRef = useRef(null);
+
+  // Setup intersection observer for infinite scroll
   useEffect(() => {
-    console.log("Feed mounted, getting posts");
-    if (authUser) {
-      getAllPosts();
-      connectSocket();
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (
+          entries[0].isIntersecting &&
+          hasMore &&
+          !isLoadingMore &&
+          !isGettingPosts
+        ) {
+          loadMorePosts();
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
     }
 
     return () => {
-      disconnectSocket();
+      if (loadMoreRef.current) {
+        observer.unobserve(loadMoreRef.current);
+      }
     };
-  }, [getAllPosts, connectSocket, disconnectSocket, authUser]);
+  }, [hasMore, isLoadingMore, isGettingPosts, loadMorePosts]);
 
-  const handleCloseModal = useCallback(() => {
-    setIsNewPostOpen(false);
-  }, [setIsNewPostOpen]);
+  useEffect(() => {
+    if (authUser && !hasLoadedInitialPosts) {
+      getAllPosts();
+    }
+  }, [getAllPosts, authUser, hasLoadedInitialPosts]);
+
+  useEffect(() => {
+    if (newPosts.length > 0) {
+      setNewPostAlert(true);
+    }
+  }, [newPosts.length, setNewPostAlert]);
 
   const handleNewPostsClick = useCallback(() => {
     console.log("Loading new posts");
@@ -56,7 +84,7 @@ const Feed = () => {
             Create New Post
           </button>
 
-          {newPostAlert && (
+          {newPostAlert && newPosts.length > 0 && (
             <button
               onClick={handleNewPostsClick}
               className="btn btn-accent flex items-center gap-2 animate-bounce"
@@ -71,8 +99,11 @@ const Feed = () => {
           )}
         </div>
 
-        {isGettingPosts ? (
-          <Loader2 className="animate-spin text-center mx-auto size-20" />
+        {/* Posts Display */}
+        {isGettingPosts && !posts.length ? (
+          <div className="flex justify-center items-center py-10">
+            <Loader2 className="animate-spin size-20" />
+          </div>
         ) : !Array.isArray(posts) || posts.length === 0 ? (
           <div className="text-center py-10">
             <p className="text-lg font-medium">No posts yet</p>
@@ -81,23 +112,35 @@ const Feed = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-6">
-            {posts.map((post) => (
-              <Post key={post._id} post={post} />
-            ))}
-          </div>
+          <>
+            <div className="space-y-6">
+              {posts.map((post) => (
+                <Post key={post._id} post={post} />
+              ))}
+            </div>
+
+            {/* Load More Trigger */}
+            <div ref={loadMoreRef} className="py-4 text-center">
+              {isLoadingMore && (
+                <Loader2 className="animate-spin mx-auto size-6" />
+              )}
+              {!hasMore && posts.length > 0 && (
+                <p className="text-sm text-gray-500">No more posts to load</p>
+              )}
+            </div>
+          </>
         )}
       </div>
 
       <Modal
         isOpen={isNewPostOpen}
-        onClose={handleCloseModal}
+        onClose={() => setIsNewPostOpen(false)}
         title="Create New Post"
       >
-        <NewPostForm onClose={handleCloseModal} />
+        <NewPostForm onClose={() => setIsNewPostOpen(false)} />
       </Modal>
     </div>
   );
 };
 
-export default memo(Feed);
+export default Feed;
