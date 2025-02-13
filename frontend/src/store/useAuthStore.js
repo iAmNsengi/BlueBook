@@ -144,7 +144,7 @@ export const useAuthStore = create((set, get) => ({
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
 
-      localStorage.setItem("token", "token");
+      localStorage.setItem("token", "");
       window.location.href = "/login";
     } catch (error) {
       console.log("Error in logout", error);

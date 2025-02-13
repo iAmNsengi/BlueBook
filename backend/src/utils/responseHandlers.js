@@ -2,7 +2,7 @@ export const successResponse = (res, statusCode, data = null) =>
   res.status(statusCode).json({ success: true, data });
 
 export const errorResponse = (err, req, res, next) => {
-  console.log(err?.name);
+  console.log(err);
 
   return res
     .status(

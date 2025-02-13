@@ -52,31 +52,29 @@ export const login = retryMiddleware(
   })
 );
 
-export const googleAuth = retryMiddleware(
-  catchAsync(async (req, res, next) => {
-    // validateRequestBody(req, res);
-    const client = new OAuth2Client();
-    const { credential, client_id } = req.body;
-    const ticket = await client.verifyIdToken({
-      idToken: credential,
-      audience: client_id,
-    });
-    const payload = ticket.getPayload();
-    const { name, given_name, email } = payload;
-    const userWithEmailExists = await User.findOne({ email });
-    if (userWithEmailExists) {
-      const token = generateToken(userWithEmailExists?._id);
-      return successResponse(res, 200, { user: userWithEmailExists, token });
-    }
-    const newUser = await User.create({
-      fullName: `${given_name} ${name}`,
-      email,
-      source: "google",
-    });
-    const token = generateToken(newUser._id);
-    return successResponse(res, 201, { user: newUser, token });
-  })
-);
+export const googleAuth = catchAsync(async (req, res, next) => {
+  // validateRequestBody(req, res);
+  const client = new OAuth2Client();
+  const { credential, client_id } = req.body;
+  const ticket = await client.verifyIdToken({
+    idToken: credential,
+    audience: client_id,
+  });
+  const payload = ticket.getPayload();
+  const { name, given_name, email } = payload;
+  const userWithEmailExists = await User.findOne({ email });
+  if (userWithEmailExists) {
+    const token = generateToken(userWithEmailExists?._id);
+    return successResponse(res, 200, { user: userWithEmailExists, token });
+  }
+  const newUser = await User.create({
+    fullName: `${given_name} ${name}`,
+    email,
+    source: "google",
+  });
+  const token = generateToken(newUser._id);
+  return successResponse(res, 201, { user: newUser, token });
+});
 
 export const logout = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];

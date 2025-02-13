@@ -6,13 +6,11 @@ import AppError from "../utils/appError.js";
 import redisClient from "../utils/redis/redisClient.js";
 
 export const isLoggedIn = catchAsync(async (req, res, next) => {
-  const token = req.headers?.authorization.split(" ")[1];
-
-  if (!token)
+  if (!req.headers.authorization)
     return next(new AppError("Unauthorized, you need to be logged in", 401));
 
+  const token = req.headers?.authorization.split(" ")[1];
   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
   const user = await User.findById(decoded.userId).select("-password").lean();
   if (!user)
     return next(new AppError("Unauthorized, you need to be logged in", 401));
