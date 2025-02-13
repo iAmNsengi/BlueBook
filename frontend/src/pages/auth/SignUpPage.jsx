@@ -54,7 +54,12 @@ const SignUpPage = () => {
     e.preventDefault();
     const success = validateForm();
 
-    if (success) signUp(formData);
+    if (success)
+      signUp({
+        email: formData.email,
+        password: formData.password,
+        fullName: formData.fullName,
+      });
   };
 
   return (
