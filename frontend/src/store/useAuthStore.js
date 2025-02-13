@@ -146,7 +146,6 @@ export const useAuthStore = create((set, get) => ({
       get().disconnectSocket();
 
       localStorage.setItem("token", "");
-      window.location.href = "/login";
       usePostStore.getState().resetPostStore();
     } catch (error) {
       console.log("Error in logout", error);
