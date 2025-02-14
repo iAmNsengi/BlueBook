@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { Bookmark, Heart, MessageCircle, Share2 } from "lucide-react";
-import { useState, memo, useCallback } from "react";
+import { Bookmark, Heart, MessageCircle, Share2, Send } from "lucide-react";
+import { useState, memo, useCallback, useRef } from "react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { usePostStore } from "../../store/usePostStore";
@@ -13,9 +13,14 @@ const Post = memo(
   ({ post }) => {
     const { authUser } = useAuthStore();
     const { likePost } = usePostStore();
-    const [isLiked, setIsLiked] = useState(post.likes?.includes(authUser._id));
-    const [likesCount, setLikesCount] = useState(post.likes?.length || 0);
+    const [isLiked, setIsLiked] = useState(
+      post?.likes?.includes(authUser?._id) || false
+    );
+    const [likesCount, setLikesCount] = useState((post?.likes || []).length);
     const [isSaved, setIsSaved] = useState(false);
+    const [showComments, setShowComments] = useState(false);
+    const [comment, setComment] = useState("");
+    const commentInputRef = useRef(null);
 
     const handleLike = useCallback(async () => {
       try {
@@ -31,7 +36,27 @@ const Post = memo(
 
     const handleSave = () => {
       setIsSaved((prev) => !prev);
-      // Here you can add your API call to update saves
+    };
+
+    const handleCommentClick = () => {
+      setShowComments(!showComments);
+      if (!showComments) {
+        setTimeout(() => {
+          commentInputRef.current?.focus();
+        }, 100);
+      }
+    };
+
+    const handleSubmitComment = async (e) => {
+      e.preventDefault();
+      if (!comment.trim()) return;
+
+      try {
+        // Add comment logic here once we implement the backend
+        setComment("");
+      } catch (error) {
+        console.error("Error posting comment:", error);
+      }
     };
 
     return (
@@ -84,7 +109,7 @@ const Post = memo(
 
         {/* Action Buttons */}
         <div className="p-3 border-t">
-          <div className="flex  justify-between">
+          <div className="flex justify-between">
             <div className="flex place-items-start gap-4">
               <button
                 className={`btn btn-ghost btn-circle ${
@@ -103,7 +128,12 @@ const Post = memo(
                   )}
                 </div>
               </button>
-              <button className="btn btn-ghost btn-circle">
+              <button
+                className={`btn btn-ghost btn-circle ${
+                  showComments ? "text-primary" : ""
+                }`}
+                onClick={handleCommentClick}
+              >
                 <MessageCircle className="h-6 w-6" />
               </button>
               <button className="btn btn-ghost btn-circle">
@@ -123,6 +153,58 @@ const Post = memo(
               />
             </button>
           </div>
+
+          {/* Comments Section */}
+          {showComments && (
+            <div className="mt-4 border-t pt-4">
+              {/* Comments List */}
+              <div className="max-h-60 overflow-y-auto mb-4">
+                {post?.comments?.length > 0 ? (
+                  post.comments.map((comment, index) => (
+                    <div key={index} className="flex items-start gap-2 mb-3">
+                      <div className="avatar">
+                        <div className="w-8 h-8 rounded-full">
+                          <img
+                            src={comment.sender?.profilePic || "/avatar.png"}
+                            alt="user"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex-1 bg-base-200 rounded-lg p-2">
+                        <p className="text-sm font-semibold">
+                          {comment.sender?.username || "User"}
+                        </p>
+                        <p className="text-sm">{comment.comment}</p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-sm text-gray-500">
+                    No comments yet
+                  </p>
+                )}
+              </div>
+
+              {/* Comment Input */}
+              <form onSubmit={handleSubmitComment} className="flex gap-2">
+                <input
+                  ref={commentInputRef}
+                  type="text"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  placeholder="Add a comment..."
+                  className="input input-bordered flex-1"
+                />
+                <button
+                  type="submit"
+                  className="btn btn-primary btn-circle"
+                  disabled={!comment.trim()}
+                >
+                  <Send className="h-5 w-5" />
+                </button>
+              </form>
+            </div>
+          )}
         </div>
       </div>
     );

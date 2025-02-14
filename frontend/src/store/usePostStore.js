@@ -198,4 +198,28 @@ export const usePostStore = create((set, get) => ({
       toast.error("Failed to like post");
     }
   },
+  addComment: async (postId, comment) => {
+    try {
+      const response = await axiosInstance.post(`/posts/${postId}/comments`, {
+        comment,
+      });
+
+      if (response.data.success) {
+        set((state) => ({
+          posts: state.posts.map((post) =>
+            post._id === postId
+              ? {
+                  ...post,
+                  comments: [...(post.comments || []), response.data.data],
+                }
+              : post
+          ),
+        }));
+        return response.data.data;
+      }
+    } catch (error) {
+      console.error("Error adding comment:", error);
+      toast.error("Failed to add comment");
+    }
+  },
 }));
