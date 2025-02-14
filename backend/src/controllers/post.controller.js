@@ -5,6 +5,13 @@ import { notifyNewPost } from "../utils/configs/socket.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
+import { successResponse } from "../utils/responseHandlers.js";
+
+const getPost = async (postId) => {
+  const post = await Post.findById(postId);
+  if (!post) throw new Error("Post with id was not found");
+  return post;
+};
 
 export const getAllPosts = async (req, res) => {
   try {
@@ -48,8 +55,6 @@ export const createPost = async (req, res) => {
     const { content, image } = req.body;
     const userId = req.user._id;
 
-    console.log("Creating post for user:", userId);
-
     const newPost = await Post.create({
       content,
       image,
@@ -91,8 +96,7 @@ export const createPost = async (req, res) => {
 export const likePost = retryMiddleware(
   catchAsync(async (req, res, next) => {
     const { post_id } = req.params;
-    const post = await Post.findById(post_id);
-    if (!post) return next(new AppError("Post with given id wasn't found"));
+    const post = await getPost(post_id);
     let isLiked = false;
     if (post?.likes?.length) {
       isLiked = post.likes.includes(req.user._id);
@@ -112,5 +116,29 @@ export const likePost = retryMiddleware(
         isLiked: !isLiked,
       },
     });
+  })
+);
+
+export const commentOnPost = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    const { post_id } = req.params;
+    const { comment } = req.body;
+    const post = await getPost(post_id);
+    post.comments.push({ sender: req.user._id, comment });
+    await post.save();
+    successResponse(res, 201, post);
+  })
+);
+
+export const deletePost = retryMiddleware(
+  catchAsync(async (req, res, next) => {
+    const { post_id } = req.params;
+    const post = getPost(post_id);
+    if (!(post.author.toString() === req.user._id.toString()))
+      return next(
+        new AppError("You can't delete this post you are not the author")
+      );
+    await Post.findByIdAndDelete(post_id);
+    successResponse(res, 200, { message: "Post deleted successfully" });
   })
 );

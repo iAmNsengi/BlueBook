@@ -84,8 +84,8 @@ const Post = memo(
 
         {/* Action Buttons */}
         <div className="p-3 border-t">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+          <div className="flex  justify-between">
+            <div className="flex place-items-start gap-4">
               <button
                 className={`btn btn-ghost btn-circle ${
                   isLiked ? "text-red-500" : ""

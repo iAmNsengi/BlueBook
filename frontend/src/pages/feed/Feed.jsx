@@ -26,7 +26,6 @@ const Feed = () => {
   } = usePostStore();
 
   const { authUser } = useAuthStore();
-
   const loadMoreRef = useRef(null);
 
   // Setup intersection observer for infinite scroll
