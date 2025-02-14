@@ -204,6 +204,8 @@ export const usePostStore = create((set, get) => ({
         comment,
       });
 
+      console.log(response.data.data, "response data ------");
+
       if (response.data.success) {
         set((state) => ({
           posts: state.posts.map((post) =>

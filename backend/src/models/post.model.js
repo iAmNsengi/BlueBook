@@ -20,9 +20,7 @@ const postSchema = new mongoose.Schema(
           ref: "User",
           required: [true, "Commentor's UUID is required"],
         },
-      },
-      {
-        comment: { type: String },
+        comment: { type: String, required: [true, "Comment can't be null"] },
       },
     ],
     likes: [

@@ -36,7 +36,8 @@ export const getAllPosts = async (req, res) => {
       .sort("-createdAt")
       .skip(skip)
       .limit(limit)
-      .populate("author", "fullName profilePic");
+      .populate("author", "fullName profilePic")
+      .populate("comments.sender", "fullName profilePic");
 
     res.status(200).json({
       success: true,
@@ -123,10 +124,28 @@ export const commentOnPost = retryMiddleware(
   catchAsync(async (req, res, next) => {
     const { post_id } = req.params;
     const { comment } = req.body;
+
+    if (!comment) {
+      return next(new AppError("Comment text is required", 400));
+    }
+
     const post = await getPost(post_id);
-    post.comments.push({ sender: req.user._id, comment });
+    post.comments.push({
+      sender: req.user._id,
+      comment: comment,
+    });
+
     await post.save();
-    successResponse(res, 201, post);
+
+    // Fetch the updated post with populated data
+    const updatedPost = await Post.findById(post_id)
+      .populate("author", "fullName profilePic")
+      .populate("comments.sender", "fullName profilePic");
+
+    // TODO: Implement socket notification for new comments
+    // notifyNewComment(updatedPost, post.author);
+
+    successResponse(res, 201, updatedPost);
   })
 );
 

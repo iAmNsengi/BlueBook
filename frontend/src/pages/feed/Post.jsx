@@ -5,6 +5,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { usePostStore } from "../../store/usePostStore";
 import { useAuthStore } from "../../store/useAuthStore";
+import toast from "react-hot-toast";
 
 // Initialize the relativeTime plugin
 dayjs.extend(relativeTime);
@@ -12,7 +13,7 @@ dayjs.extend(relativeTime);
 const Post = memo(
   ({ post }) => {
     const { authUser } = useAuthStore();
-    const { likePost } = usePostStore();
+    const { likePost, addComment } = usePostStore();
     const [isLiked, setIsLiked] = useState(
       post?.likes?.includes(authUser?._id) || false
     );
@@ -52,10 +53,14 @@ const Post = memo(
       if (!comment.trim()) return;
 
       try {
-        // Add comment logic here once we implement the backend
+        console.log(comment, "the comment");
+
+        await addComment(post._id, comment);
         setComment("");
+        toast.success("Comment added successfully");
       } catch (error) {
-        console.error("Error posting comment:", error);
+        console.log(error);
+        toast.error("Error posting comment:");
       }
     };
 
@@ -172,9 +177,9 @@ const Post = memo(
                       </div>
                       <div className="flex-1 bg-base-200 rounded-lg p-2">
                         <p className="text-sm font-semibold">
-                          {comment.sender?.username || "User"}
+                          {comment.sender?.fullName || "User"}
                         </p>
-                        <p className="text-sm">{comment.comment}</p>
+                        <p className="text-sm">{comment.comment || "null"}</p>
                       </div>
                     </div>
                   ))

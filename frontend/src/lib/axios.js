@@ -26,16 +26,3 @@ axiosInstance.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-
-//  response interceptor to handle errors
-axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401) {
-      // Handling unauthorized access
-      localStorage.removeItem("token");
-      window.location.href = "/login";
-    }
-    return Promise.reject(error);
-  }
-);
