@@ -24,11 +24,8 @@ export const usePostStore = create((set, get) => ({
   hasMore: true,
 
   getAllPosts: async (isLoadMore = false) => {
-    if (!isLoadMore) {
-      set({ isGettingPosts: !get().hasLoadedInitialPosts });
-    } else {
-      set({ isLoadingMore: true });
-    }
+    if (!isLoadMore) set({ isGettingPosts: !get().hasLoadedInitialPosts });
+    else set({ isLoadingMore: true });
 
     try {
       const currentPage = isLoadMore ? get().page : 1;
@@ -58,9 +55,7 @@ export const usePostStore = create((set, get) => ({
 
   loadMorePosts: () => {
     const state = get();
-    if (!state.isLoadingMore && state.hasMore) {
-      state.getAllPosts(true);
-    }
+    if (!state.isLoadingMore && state.hasMore) state.getAllPosts(true);
   },
 
   createPost: async (postData) => {
@@ -69,11 +64,9 @@ export const usePostStore = create((set, get) => ({
 
       if (postData.image) {
         const imageSizeInMB = (postData.image.length * 0.75) / 1024 / 1024;
-        if (imageSizeInMB > 5) {
+        if (imageSizeInMB > 5)
           throw new Error("Image size should be less than 5MB");
-        }
       }
-
       const response = await axiosInstance.post("/posts/add", {
         content: postData.content || "",
         image: postData.image || null,
@@ -84,9 +77,7 @@ export const usePostStore = create((set, get) => ({
           posts: [response.data.data, ...(state.posts || [])],
         }));
         return response.data.data;
-      } else {
-        throw new Error(response.data.message || "Failed to create post");
-      }
+      } else throw new Error(response.data.message || "Failed to create post");
     } catch (error) {
       console.error("Create post error:", error);
       throw error;
@@ -146,6 +137,10 @@ export const usePostStore = create((set, get) => ({
       });
     });
 
+    socket.on("postLike", (post) => {
+      console.log("A post was liked", post);
+    });
+
     socket.connect();
   },
   setIsNewPostOpen: (value) => set({ isNewPostOpen: value }),
@@ -203,8 +198,6 @@ export const usePostStore = create((set, get) => ({
       const response = await axiosInstance.post(`/posts/${postId}/comments`, {
         comment,
       });
-
-      console.log(response.data.data, "response data ------");
 
       if (response.data.success) {
         set((state) => ({

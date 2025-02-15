@@ -21,15 +21,25 @@ if (cluster.isPrimary) {
   const numCPUs = os.cpus().length;
   console.log(`Master ${process.pid} is running`);
 
-  for (let i = 0; i < numCPUs; i++) cluster.fork();
+  // Create server and start listening in the master process
+  const PORT = process.env.PORT || 5001;
+  server.listen(PORT, () => {
+    console.log(`Server is listening on port ${PORT}`);
+    connectDB();
+  });
+
+  // Then fork workers
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
   cluster.on("exit", (worker, code, signal) => {
     console.log(`Worker ${worker.process.pid} died`);
     cluster.fork(); // Restart the worker
   });
 } else {
+  // Worker processes only need to set up the Express middleware and routes
   app.use(corsOptions);
-
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   app.use(cookieParser());
@@ -43,9 +53,5 @@ if (cluster.isPrimary) {
   // Initialize Redis connection
   initializeRedis();
 
-  const PORT = process.env.PORT || 5001;
-  server.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-    connectDB();
-  });
+  console.log(`Worker ${process.pid} started`);
 }

@@ -50,4 +50,12 @@ export const notifyNewPost = (post, usersToNotify) => {
   });
 };
 
+export const notifyPostLike = (post, usersToNotify) => {
+  usersToNotify.forEach((userId) => {
+    if (userSocketMap[userId]) {
+      io.to(userSocketMap[userId]).emit("postLike", post);
+    }
+  });
+};
+
 export { app, server, io };

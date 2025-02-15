@@ -15,25 +15,37 @@ const Post = memo(
     const { authUser } = useAuthStore();
     const { likePost, addComment } = usePostStore();
     const [isLiked, setIsLiked] = useState(
-      post?.likes?.includes(authUser?._id) || false
+      post?.likes?.includes(authUser?._id)
     );
-    const [likesCount, setLikesCount] = useState((post?.likes || []).length);
+    const [likesCount, setLikesCount] = useState(post?.likes?.length || 0);
     const [isSaved, setIsSaved] = useState(false);
     const [showComments, setShowComments] = useState(false);
     const [comment, setComment] = useState("");
+    const [comments, setComments] = useState(post?.comments || []);
     const commentInputRef = useRef(null);
 
     const handleLike = useCallback(async () => {
+      // Optimistic update
+      setIsLiked((prev) => !prev);
+      setLikesCount((prev) => prev + (isLiked ? -1 : 1));
+
       try {
         const result = await likePost(post._id);
-        if (result) {
+        // If the server response differs from our optimistic update
+        if (result.isLiked !== !isLiked) {
           setIsLiked(result.isLiked);
           setLikesCount(result.likes);
         }
+        // TODO: Emit socket event for real-time updates
+        // socket.emit('postLike', { postId: post._id, isLiked: result.isLiked });
       } catch (error) {
-        console.error("Error handling like:", error);
+        // Revert optimistic update on error
+        console.log(error);
+        setIsLiked((prev) => !prev);
+        setLikesCount((prev) => prev + (isLiked ? 1 : -1));
+        toast.error("Failed to update like");
       }
-    }, [post._id, likePost]);
+    }, [post._id, isLiked, likePost]);
 
     const handleSave = () => {
       setIsSaved((prev) => !prev);
@@ -52,17 +64,45 @@ const Post = memo(
       e.preventDefault();
       if (!comment.trim()) return;
 
-      try {
-        console.log(comment, "the comment");
+      // Create temporary comment
+      const tempComment = {
+        _id: `temp-${Date.now()}`,
+        sender: {
+          _id: authUser._id,
+          fullName: authUser.fullName,
+          profilePic: authUser.profilePic,
+        },
+        comment: comment.trim(),
+      };
 
-        await addComment(post._id, comment);
-        setComment("");
-        toast.success("Comment added successfully");
+      // Optimistic update
+      setComments((prev) => [...prev, tempComment]);
+      setComment(""); // Clear input immediately
+
+      try {
+        const result = await addComment(post._id, comment.trim());
+        // Replace temp comment with real one from server
+        setComments((prev) =>
+          prev.map((c) => (c._id === tempComment._id ? result.newComment : c))
+        );
+        // TODO: Emit socket event for real-time updates
+        // socket.emit('newComment', { postId: post._id, comment: result.newComment });
       } catch (error) {
         console.log(error);
-        toast.error("Error posting comment:");
+        setComments((prev) => prev.filter((c) => c._id !== tempComment._id));
+        setComment(comment); // Restore the comment text
+        toast.error("Failed to post comment");
       }
     };
+
+    // useEffect(() => {
+    //   socket.on('postLikeUpdate', handleLikeUpdate);
+    //   socket.on('newCommentUpdate', handleCommentUpdate);
+    //   return () => {
+    //     socket.off('postLikeUpdate');
+    //     socket.off('newCommentUpdate');
+    //   };
+    // }, []);
 
     return (
       <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300 mb-6">
@@ -162,11 +202,13 @@ const Post = memo(
           {/* Comments Section */}
           {showComments && (
             <div className="mt-4 border-t pt-4">
-              {/* Comments List */}
               <div className="max-h-60 overflow-y-auto mb-4">
-                {post?.comments?.length > 0 ? (
-                  post.comments.map((comment, index) => (
-                    <div key={index} className="flex items-start gap-2 mb-3">
+                {comments.length > 0 ? (
+                  comments.map((comment) => (
+                    <div
+                      key={comment._id}
+                      className="flex items-start gap-2 mb-3"
+                    >
                       <div className="avatar">
                         <div className="w-8 h-8 rounded-full">
                           <img
@@ -179,7 +221,7 @@ const Post = memo(
                         <p className="text-sm font-semibold">
                           {comment.sender?.fullName || "User"}
                         </p>
-                        <p className="text-sm">{comment.comment || "null"}</p>
+                        <p className="text-sm">{comment.comment}</p>
                       </div>
                     </div>
                   ))
@@ -190,7 +232,6 @@ const Post = memo(
                 )}
               </div>
 
-              {/* Comment Input */}
               <form onSubmit={handleSubmitComment} className="flex gap-2">
                 <input
                   ref={commentInputRef}
@@ -215,12 +256,7 @@ const Post = memo(
     );
   },
   (prevProps, nextProps) => {
-    return (
-      prevProps.post._id === nextProps.post._id &&
-      prevProps.post.content === nextProps.post.content &&
-      prevProps.post.image === nextProps.post.image &&
-      prevProps.post.likes?.length === nextProps.post.likes?.length
-    );
+    return prevProps.post._id === nextProps.post._id;
   }
 );
 

@@ -1,7 +1,7 @@
 import Post from "../models/post.model.js";
 import Message from "../models/message.model.js";
 import mongoose from "mongoose";
-import { notifyNewPost } from "../utils/configs/socket.js";
+import { notifyNewPost, notifyPostLike } from "../utils/configs/socket.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
@@ -110,9 +110,26 @@ export const likePost = retryMiddleware(
 
     await post.save();
 
+    // Find users who chat with the post creator
+    const conversations = await Message.find({
+      $or: [{ senderId: userId }, { receiverId: userId }],
+    });
+
+    const usersToNotify = [
+      ...new Set(
+        conversations.flatMap((convo) => [
+          convo.senderId.toString(),
+          convo.receiverId.toString(),
+        ])
+      ),
+    ].filter((id) => id !== userId.toString());
+
+    notifyPostLike(post, usersToNotify);
+
     res.status(200).json({
       success: true,
       data: {
+        post: post._id,
         likes: post.likes.length,
         isLiked: !isLiked,
       },
