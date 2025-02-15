@@ -1,5 +1,3 @@
-import os from "os";
-import cluster from "cluster";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
@@ -17,41 +15,22 @@ import { initializeRedis } from "./utils/redis/redisClient.js";
 
 dotenv.config();
 
-if (cluster.isPrimary) {
-  const numCPUs = os.cpus().length;
-  console.log(`Master ${process.pid} is running`);
+app.use(corsOptions);
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+app.use(cookieParser());
+app.use(mongoSanitize());
+app.use(compression());
 
-  // Create server and start listening in the master process
-  const PORT = process.env.PORT || 5001;
-  server.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
-    connectDB();
-  });
+app.use(requestsLimit);
+app.use(appRoutes);
+app.use(errorResponse);
 
-  // Then fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
+// Initialize Redis connection
+initializeRedis();
 
-  cluster.on("exit", (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    cluster.fork(); // Restart the worker
-  });
-} else {
-  // Worker processes only need to set up the Express middleware and routes
-  app.use(corsOptions);
-  app.use(express.json({ limit: "50mb" }));
-  app.use(express.urlencoded({ limit: "50mb", extended: true }));
-  app.use(cookieParser());
-  app.use(mongoSanitize());
-  app.use(compression());
-
-  app.use(requestsLimit);
-  app.use(appRoutes);
-  app.use(errorResponse);
-
-  // Initialize Redis connection
-  initializeRedis();
-
-  console.log(`Worker ${process.pid} started`);
-}
+const PORT = process.env.PORT || 5001;
+server.listen(PORT, () => {
+  console.log(`Server is listening on port ${PORT}`);
+  connectDB();
+});
