@@ -4,7 +4,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:3000",
   "https://vuga.onrender.com",
-  "https://vuga-backend.onrender.com",
+  "https://vuga-app-backend.vercel.app",
 ];
 
 export const corsOptions = (req, res, next) => {
