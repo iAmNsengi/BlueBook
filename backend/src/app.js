@@ -29,8 +29,30 @@ app.use(errorResponse);
 // Initialize Redis connection
 initializeRedis();
 
-const PORT = process.env.PORT || 5001;
-server.listen(PORT, () => {
-  console.log(`Server is listening on port ${PORT}`);
-  connectDB();
-});
+const startServer = async () => {
+  const PORT = process.env.PORT || 3000;
+
+  try {
+    await new Promise((resolve, reject) => {
+      server
+        .listen(PORT, () => {
+          console.log(`Server is listening on port ${PORT}`);
+          connectDB();
+          resolve();
+        })
+        .on("error", (err) => {
+          if (err.code === "EADDRINUSE") {
+            console.log(`Port ${PORT} is busy, trying ${PORT + 1}`);
+            server.listen(PORT + 1);
+          } else {
+            reject(err);
+          }
+        });
+    });
+  } catch (error) {
+    console.error("Failed to start server:", error);
+    process.exit(1);
+  }
+};
+
+startServer();
