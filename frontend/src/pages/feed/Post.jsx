@@ -23,6 +23,7 @@ const Post = memo(
     const [comment, setComment] = useState("");
     const [comments, setComments] = useState(post?.comments || []);
     const commentInputRef = useRef(null);
+    const commentsEndRef = useRef(null);
 
     const handleLike = useCallback(async () => {
       // Optimistic update
@@ -66,7 +67,7 @@ const Post = memo(
       e.preventDefault();
       if (!comment.trim()) return;
 
-      // Create temporary comment
+      // Create temporary comment with all required fields
       const tempComment = {
         _id: `temp-${Date.now()}`,
         sender: {
@@ -75,6 +76,8 @@ const Post = memo(
           profilePic: authUser.profilePic,
         },
         comment: comment.trim(),
+        createdAt: new Date().toISOString(),
+        isTemp: true,
       };
 
       // Optimistic update
@@ -83,16 +86,25 @@ const Post = memo(
 
       try {
         const result = await addComment(post._id, comment.trim());
-        // Replace temp comment with real one from server
+        // Update the temporary comment with server data while maintaining position
         setComments((prev) =>
-          prev.map((c) => (c._id === tempComment._id ? result.newComment : c))
+          prev.map((c) =>
+            c._id === tempComment._id
+              ? { ...result.newComment, isTemp: false }
+              : c
+          )
         );
-        // TODO: Emit socket event for real-time updates
-        // socket.emit('newComment', { postId: post._id, comment: result.newComment });
+
+        // Scroll to the bottom of the comments container
+        commentsEndRef.current.scrollIntoView({ behavior: "smooth" });
       } catch (error) {
         console.log(error);
-        setComments((prev) => prev.filter((c) => c._id !== tempComment._id));
-        setComment(comment); // Restore the comment text
+        // Keep the comment but mark it as failed
+        setComments((prev) =>
+          prev.map((c) =>
+            c._id === tempComment._id ? { ...c, failed: true } : c
+          )
+        );
         toast.error("Failed to post comment");
       }
     };
@@ -181,7 +193,14 @@ const Post = memo(
                 }`}
                 onClick={handleCommentClick}
               >
-                <MessageCircle className="h-6 w-6" />
+                <div className="flex flex-col">
+                  <MessageCircle className="h-6 w-6" />
+                  {comments?.length > 0 && (
+                    <span className="text-xs font-medium">
+                      {comments.length}
+                    </span>
+                  )}
+                </div>
               </button>
               <button className="btn btn-ghost btn-circle">
                 <Share2 className="h-6 w-6" />
@@ -205,33 +224,48 @@ const Post = memo(
           {showComments && (
             <div className="mt-4 border-t pt-4">
               <div className="max-h-60 overflow-y-auto mb-4">
-                {comments.length > 0 ? (
-                  comments.map((comment) => (
-                    <div
-                      key={comment._id}
-                      className="flex items-start gap-2 mb-3"
-                    >
-                      <div className="avatar">
-                        <div className="w-8 h-8 rounded-full">
-                          <img
-                            src={comment.sender?.profilePic || "/avatar.png"}
-                            alt="user"
-                          />
+                {comments && comments.length > 0 ? (
+                  comments.map(
+                    (comment) =>
+                      comment &&
+                      comment.sender && (
+                        <div
+                          key={comment._id}
+                          className={`flex items-start gap-2 mb-3 ${
+                            comment.isTemp ? "opacity-50" : ""
+                          } ${comment.failed ? "bg-red-50" : ""}`}
+                        >
+                          <div className="avatar">
+                            <div className="w-8 h-8 rounded-full">
+                              <img
+                                src={
+                                  comment.sender?.profilePic || "/avatar.png"
+                                }
+                                alt={comment.sender?.fullName || "User"}
+                                className="object-cover"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex-1 bg-base-200 rounded-lg p-2">
+                            <p className="text-sm font-semibold">
+                              {comment.sender?.fullName || "Anonymous"}
+                            </p>
+                            <p className="text-sm">{comment.comment}</p>
+                            {comment.failed && (
+                              <p className="text-xs text-red-500">
+                                Failed to post - tap to retry
+                              </p>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                      <div className="flex-1 bg-base-200 rounded-lg p-2">
-                        <p className="text-sm font-semibold">
-                          {comment.sender?.fullName || "User"}
-                        </p>
-                        <p className="text-sm">{comment.comment}</p>
-                      </div>
-                    </div>
-                  ))
+                      )
+                  )
                 ) : (
                   <p className="text-center text-sm text-gray-500">
                     No comments yet
                   </p>
                 )}
+                <div ref={commentsEndRef} />
               </div>
 
               <form onSubmit={handleSubmitComment} className="flex gap-2">
