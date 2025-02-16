@@ -4,11 +4,7 @@ import { create } from "zustand";
 
 import { axiosInstance } from "../lib/axios";
 import { usePostStore } from "./usePostStore";
-
-const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5001"
-    : "https://vuga-backend.onrender.com";
+import { BASE_URL } from ".";
 
 export const useAuthStore = create((set, get) => ({
   authUser: null,
@@ -165,6 +161,7 @@ export const useAuthStore = create((set, get) => ({
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
+      localStorage.setItem("token", token);
       set({ authUser: user, authToken: token });
       await get().checkAuth();
       toast.success(`Welcome back ${user?.fullName} 😊`);

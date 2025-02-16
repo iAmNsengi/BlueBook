@@ -3,11 +3,7 @@ import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 import { useAuthStore } from "./useAuthStore";
 import { axiosInstance } from "../lib/axios";
-
-const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5001"
-    : "https://vuga-backend.onrender.com";
+import { BASE_URL } from ".";
 
 export const usePostStore = create((set, get) => ({
   socket: null,
@@ -170,6 +166,7 @@ export const usePostStore = create((set, get) => ({
   likePost: async (postId) => {
     try {
       const response = await axiosInstance.post(`/posts/${postId}/like`);
+      console.log(response.data);
 
       if (response.data.success) {
         set((state) => ({
@@ -190,7 +187,6 @@ export const usePostStore = create((set, get) => ({
       }
     } catch (error) {
       console.error("Error liking post:", error);
-      toast.error("Failed to like post");
     }
   },
   addComment: async (postId, comment) => {

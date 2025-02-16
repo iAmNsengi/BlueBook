@@ -32,6 +32,8 @@ const Post = memo(
       try {
         const result = await likePost(post._id);
         // If the server response differs from our optimistic update
+        console.log(result);
+
         if (result.isLiked !== !isLiked) {
           setIsLiked(result.isLiked);
           setLikesCount(result.likes);

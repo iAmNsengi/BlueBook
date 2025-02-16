@@ -98,6 +98,7 @@ export const likePost = retryMiddleware(
   catchAsync(async (req, res, next) => {
     const { post_id } = req.params;
     const post = await getPost(post_id);
+
     let isLiked = false;
     if (post?.likes?.length) {
       isLiked = post.likes.includes(req.user._id);
@@ -110,9 +111,11 @@ export const likePost = retryMiddleware(
 
     await post.save();
 
+    console.log(post);
+
     // Find users who chat with the post creator
     const conversations = await Message.find({
-      $or: [{ senderId: userId }, { receiverId: userId }],
+      $or: [{ senderId: req.user._id }, { receiverId: req.user._id }],
     });
 
     const usersToNotify = [
@@ -122,7 +125,7 @@ export const likePost = retryMiddleware(
           convo.receiverId.toString(),
         ])
       ),
-    ].filter((id) => id !== userId.toString());
+    ].filter((id) => id !== req.user._id.toString());
 
     notifyPostLike(post, usersToNotify);
 
