@@ -26,15 +26,35 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const token = localStorage.getItem("token");
-      if (token)
-        axiosInstance.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${token}`;
+      if (!token) {
+        set({ isCheckingAuth: false, authUser: null });
+        return;
+      }
+
+      // Use cached user data if available
+      const cachedUser = sessionStorage.getItem("user");
+      if (cachedUser) {
+        set({
+          authUser: JSON.parse(cachedUser),
+          isCheckingAuth: false,
+        });
+        get().connectSocket();
+        return;
+      }
+
+      axiosInstance.defaults.headers.common[
+        "Authorization"
+      ] = `Bearer ${token}`;
       const response = await axiosInstance.get("/auth/check");
+
+      // Cache the user data
+      sessionStorage.setItem("user", JSON.stringify(response.data));
       set({ authUser: response.data });
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth", error);
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("user");
       set({ authUser: null });
     } finally {
       set({ isCheckingAuth: false });
@@ -47,8 +67,12 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/google", data);
       if (!res?.data) return toast.error("Failed to signup with Google");
       const { token, user } = res.data.data;
-      set({ authUser: user, authToken: token });
+
+      // Cache user data
+      sessionStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("token", token);
+
+      set({ authUser: user, authToken: token });
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
@@ -141,7 +165,9 @@ export const useAuthStore = create((set, get) => ({
       toast.success(`Until we meet again ${currentUser.fullName} 👌`);
       get().disconnectSocket();
 
-      localStorage.setItem("token", "");
+      // Clear both localStorage and sessionStorage
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("user");
       usePostStore.getState().resetPostStore();
     } catch (error) {
       console.log("Error in logout", error);
@@ -158,10 +184,14 @@ export const useAuthStore = create((set, get) => ({
       const { user, token } = res.data.data;
 
       if (!user) return toast.error("Invalid response from server");
+
+      // Cache user data
+      sessionStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("token", token);
+
       axiosInstance.defaults.headers.common[
         "Authorization"
       ] = `Bearer ${token}`;
-      localStorage.setItem("token", token);
       set({ authUser: user, authToken: token });
       await get().checkAuth();
       toast.success(`Welcome back ${user?.fullName} 😊`);
