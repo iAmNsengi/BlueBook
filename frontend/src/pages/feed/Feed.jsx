@@ -52,7 +52,9 @@ const Feed = () => {
   }, [hasMore, isLoadingMore, isGettingPosts, loadMorePosts]);
 
   useEffect(() => {
-    if (authUser && !hasLoadedInitialPosts) getAllPosts();
+    if (authUser && !hasLoadedInitialPosts) {
+      getAllPosts();
+    }
   }, [getAllPosts, authUser, hasLoadedInitialPosts]);
 
   useEffect(() => {

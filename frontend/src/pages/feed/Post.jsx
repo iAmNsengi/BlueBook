@@ -89,13 +89,7 @@ const Post = memo(
       try {
         const result = await addComment(post._id, comment.trim());
         // Update the temporary comment with server data while maintaining position
-        setComments((prev) =>
-          prev.map((c) =>
-            c._id === tempComment._id
-              ? { ...result.newComment, isTemp: false }
-              : c
-          )
-        );
+        setComments(result.comments);
 
         // Scroll to the bottom of the comments container
         commentsEndRef.current.scrollIntoView({ behavior: "smooth" });

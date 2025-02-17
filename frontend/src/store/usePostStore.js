@@ -5,6 +5,10 @@ import { useAuthStore } from "./useAuthStore";
 import { axiosInstance } from "../lib/axios";
 import { BASE_URL } from ".";
 
+const CACHE_KEY = "postCache";
+const CACHE_TIMESTAMP_KEY = "postCacheTimestamp";
+const CACHE_DURATION = 5 * 60 * 1000; 
+
 export const usePostStore = create((set, get) => ({
   socket: null,
   isGettingPosts: false,
@@ -19,25 +23,92 @@ export const usePostStore = create((set, get) => ({
   page: 1,
   hasMore: true,
 
+  getCachedPosts: () => {
+    try {
+      const cachedData = localStorage.getItem(CACHE_KEY);
+      const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
+      if (!cachedData || !timestamp) return null;
+
+      // Check if cache is still valid
+      const isExpired = Date.now() - parseInt(timestamp) > CACHE_DURATION;
+      if (isExpired) {
+        localStorage.removeItem(CACHE_KEY);
+        localStorage.removeItem(CACHE_TIMESTAMP_KEY);
+        return null;
+      }
+
+      return JSON.parse(cachedData);
+    } catch (error) {
+      console.error("Error reading cache:", error);
+      return null;
+    }
+  },
+
+  setCachedPosts: (posts) => {
+    try {
+      localStorage.setItem(CACHE_KEY, JSON.stringify(posts));
+      localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
+    } catch (error) {
+      console.error("Error setting cache:", error);
+    }
+  },
+
   getAllPosts: async (isLoadMore = false) => {
-    if (!isLoadMore) set({ isGettingPosts: !get().hasLoadedInitialPosts });
-    else set({ isLoadingMore: true });
+    if (!isLoadMore) {
+      // Try to load cached posts first
+      const cachedPosts = get().getCachedPosts();
+      if (cachedPosts) {
+        set({
+          posts: cachedPosts,
+          hasLoadedInitialPosts: true,
+          isGettingPosts: false,
+        });
+      } else {
+        set({ isGettingPosts: !get().hasLoadedInitialPosts });
+      }
+    } else {
+      set({ isLoadingMore: true });
+    }
 
     try {
       const currentPage = isLoadMore ? get().page : 1;
-      const res = await axiosInstance.get(`/posts?page=${currentPage}&limit=5`);
+      const lastPostDate = !isLoadMore && get().posts[0]?.createdAt;
 
-      set((state) => ({
-        posts: isLoadMore ? [...state.posts, ...res.data.data] : res.data.data,
-        hasMore: res?.data?.data.length === 5,
-        page: currentPage + 1,
-        hasLoadedInitialPosts: true,
-        ...(!isLoadMore && {
-          newPosts: [],
-          newPostAlert: false,
-          lastViewedAt: Date.now(),
-        }),
-      }));
+      const res = await axiosInstance.get("/posts", {
+        params: {
+          page: currentPage,
+          limit: 5,
+          after: lastPostDate, // Send the timestamp of the most recent post
+        },
+      });
+
+      const newPosts = res.data.data;
+
+      set((state) => {
+        const updatedPosts = isLoadMore
+          ? [...state.posts, ...newPosts]
+          : lastPostDate
+          ? [...newPosts, ...state.posts]
+          : newPosts;
+
+        // Cache the updated posts
+        get().setCachedPosts(updatedPosts);
+
+        return {
+          posts: updatedPosts,
+          hasMore: newPosts.length === 5,
+          page: currentPage + 1,
+          hasLoadedInitialPosts: true,
+          ...(lastPostDate
+            ? {}
+            : {
+                newPosts: [],
+                newPostAlert: false,
+                lastViewedAt: Date.now(),
+              }),
+        };
+      });
     } catch (error) {
       console.error("Error fetching posts:", error);
       toast.error(error.response?.data?.message || "Error fetching posts");

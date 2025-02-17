@@ -18,6 +18,7 @@ export const getAllPosts = async (req, res) => {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 5;
     const skip = (page - 1) * limit;
+    const after = req.query.after; // Timestamp of the most recent post
 
     const conversations = await Message.find({
       $or: [{ senderId: req.user._id }, { receiverId: req.user._id }],
@@ -32,12 +33,21 @@ export const getAllPosts = async (req, res) => {
       ),
     ].map((id) => new mongoose.Types.ObjectId(id));
 
-    const posts = await Post.find({ author: { $in: usersWeChat } })
+    // Build query based on whether we're fetching newer or older posts
+    const query = {
+      author: { $in: usersWeChat },
+      ...(after && { createdAt: { $gt: new Date(after) } }),
+    };
+
+    const posts = await Post.find(query)
       .sort("-createdAt")
-      .skip(skip)
+      .skip(after ? 0 : skip) // Skip only when fetching older posts
       .limit(limit)
       .populate("author", "fullName profilePic")
       .populate("comments.sender", "fullName profilePic");
+
+    // Add cache control headers
+    res.set("Cache-Control", "private, max-age=300"); // 5 minutes cache
 
     res.status(200).json({
       success: true,
