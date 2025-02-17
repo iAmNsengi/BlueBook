@@ -213,4 +213,15 @@ export const usePostStore = create((set, get) => ({
       toast.error("Failed to add comment");
     }
   },
+  deletePost: async (postId) => {
+    try {
+      const response = await axiosInstance.delete(`/posts/${postId}`);
+      if (response.data.success) {
+        toast.success("Post deleted successfully");
+      }
+    } catch (error) {
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete your post");
+    }
+  },
 }));

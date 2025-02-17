@@ -13,7 +13,7 @@ dayjs.extend(relativeTime);
 const Post = memo(
   ({ post }) => {
     const { authUser } = useAuthStore();
-    const { likePost, addComment } = usePostStore();
+    const { likePost, addComment, deletePost } = usePostStore();
     const [isLiked, setIsLiked] = useState(
       post?.likes?.includes(authUser?._id)
     );
@@ -24,6 +24,8 @@ const Post = memo(
     const [comments, setComments] = useState(post?.comments || []);
     const commentInputRef = useRef(null);
     const commentsEndRef = useRef(null);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [showDropdown, setShowDropdown] = useState(false);
 
     const handleLike = useCallback(async () => {
       // Optimistic update
@@ -109,6 +111,19 @@ const Post = memo(
       }
     };
 
+    const handleDeletePost = async () => {
+      try {
+        await deletePost(post._id);
+        toast.success("Post deleted successfully!");
+      } catch (error) {
+        console.error("Error deleting post:", error);
+        toast.error("Failed to delete post");
+      } finally {
+        setShowDeleteConfirm(false);
+        setShowDropdown(false);
+      }
+    };
+
     // useEffect(() => {
     //   socket.on('postLikeUpdate', handleLikeUpdate);
     //   socket.on('newCommentUpdate', handleCommentUpdate);
@@ -142,8 +157,50 @@ const Post = memo(
               </p>
             </div>
           </div>
-          <button className="btn btn-ghost btn-circle">⋮</button>
+          <div className="relative">
+            <button
+              className="btn btn-ghost btn-circle"
+              onClick={() => setShowDropdown((prev) => !prev)}
+            >
+              ⋮
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 mt-2 w-48 bg-base-300 border rounded shadow-lg z-10">
+                <ul className="py-1">
+                  <li>
+                    <button
+                      className="block px-4 py-2 text-sm  w-full text-left"
+                      onClick={handleDeletePost}
+                    >
+                      Delete Post
+                    </button>
+                  </li>
+                </ul>
+              </div>
+            )}
+          </div>
         </div>
+
+        {/* Confirmation Dialog */}
+        {showDeleteConfirm && (
+          <div className="modal">
+            <div className="modal-box">
+              <h2 className="font-bold text-lg">Delete Post</h2>
+              <p>Are you sure you want to delete this post?</p>
+              <div className="modal-action">
+                <button className="btn" onClick={handleDeletePost}>
+                  Yes, delete
+                </button>
+                <button
+                  className="btn"
+                  onClick={() => setShowDeleteConfirm(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Image */}
         {post?.image && (
