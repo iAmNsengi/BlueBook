@@ -1,16 +1,8 @@
-import cors from "cors";
-
-const allowedOrigins = [
-  "http://localhost:5173",
-  "http://localhost:3000",
-  process.env.FRONTEND_URL,
-  process.env.BACKEND_URL,
-];
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.BACKEND_URL];
 
 export const corsOptions = (req, res, next) => {
   const origin = req.headers.origin;
 
-  // Allow requests with no origin (like mobile apps or curl requests)
   if (!origin) {
     return next();
   }
@@ -28,7 +20,6 @@ export const corsOptions = (req, res, next) => {
     res.setHeader("Access-Control-Allow-Credentials", "true");
   }
 
-  // Handle preflight requests
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
