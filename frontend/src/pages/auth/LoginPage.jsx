@@ -33,13 +33,7 @@ const LoginPage = () => {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="size-6 text-primary animate-pulse" />
-              </div>
-              <h1 className="text-2xl font-bold mt-2">
-                Welcome Back <span className="animate-pulse">🤗</span>{" "}
-              </h1>
-              <p className="text-base-content/60">Login to your accout</p>
+              <h1 className="text-2xl font-bold mt-2">Login to your account</h1>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -48,9 +42,7 @@ const LoginPage = () => {
                 <span className="label-text font-medium">E-mail</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"></div>
                 <input
                   required
                   type="email"
@@ -67,9 +59,7 @@ const LoginPage = () => {
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"></div>
                 <input
                   required
                   type={showPassword ? "text" : "password"}
@@ -131,10 +121,18 @@ const LoginPage = () => {
       </div>
 
       {/* right side */}
-      <AuthImagePattern
+      {/* <AuthImagePattern
         title="Welcome back 🤗"
         subtitle="Stay connected to your friends and community 👌"
-      />
+      /> */}
+      <div
+        className="inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('https://images.unsplash.com/photo-1718804714714-03e882445fcd?q=80&w=986&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+        }}
+      >
+        <img src={`/vuga.png`} alt="auth" className="w-full h-full" />
+      </div>
     </div>
   );
 };
