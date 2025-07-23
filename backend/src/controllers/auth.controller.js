@@ -12,7 +12,6 @@ import validateRequestBody from "../utils/validateRequestBody.js";
 import { successResponse } from "../utils/responseHandlers.js";
 import { generateToken } from "../utils/auth/generateToken.js";
 import { retryMiddleware } from "../middlewares/retry.middleware.js";
-import redisClient from "../utils/redis/redisClient.js";
 import { sendEmail } from "../utils/emails/sendEmail.js";
 import { createResetPasswordEmailTemplate } from "../utils/emails/emailTemplates.js";
 import PasswordResets from "../models/passwordResets.model.js";
@@ -30,7 +29,6 @@ export const signup = retryMiddleware(
     });
     user.password = undefined;
     const token = generateToken(user._id);
-    redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 201, { user, token });
   })
 );
@@ -47,7 +45,6 @@ export const login = retryMiddleware(
     const token = generateToken(user._id);
     console.log(token);
     user.password = undefined;
-    redisClient.set(`User:${user?.email}`, token);
     return successResponse(res, 200, { user, token });
   })
 );
@@ -79,14 +76,6 @@ export const googleAuth = catchAsync(async (req, res, next) => {
 export const logout = catchAsync(async (req, res, next) => {
   const token = req.headers.authorization.split(" ")[1];
   const decoded = jwt.decode(token);
-
-  const blacklistKey = `blacklist:${decoded.userId}:${decoded.iat}`;
-
-  await redisClient.setEx(
-    blacklistKey,
-    decoded.exp - Math.floor(Date.now() / 1000),
-    token
-  );
   return successResponse(res, 200, "Logged out successfully");
 });
 

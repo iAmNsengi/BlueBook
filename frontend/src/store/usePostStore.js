@@ -7,7 +7,7 @@ import { BASE_URL } from ".";
 
 const CACHE_KEY = "postCache";
 const CACHE_TIMESTAMP_KEY = "postCacheTimestamp";
-const CACHE_DURATION = 5 * 60 * 1000; 
+const CACHE_DURATION = 5 * 60 * 1000;
 
 export const usePostStore = create((set, get) => ({
   socket: null,
@@ -105,7 +105,7 @@ export const usePostStore = create((set, get) => ({
             : {
                 newPosts: [],
                 newPostAlert: false,
-                lastViewedAt: Date.now(),
+                lastViewedAt: new Date().toISOString(),
               }),
         };
       });

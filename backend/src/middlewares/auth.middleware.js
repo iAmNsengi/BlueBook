@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import catchAsync from "../utils/catchAsync.js";
 import AppError from "../utils/appError.js";
-import redisClient from "../utils/redis/redisClient.js";
 
 export const isLoggedIn = catchAsync(async (req, res, next) => {
   if (!req.headers.authorization)
@@ -14,12 +13,6 @@ export const isLoggedIn = catchAsync(async (req, res, next) => {
   const user = await User.findById(decoded.userId).select("-password").lean();
   if (!user)
     return next(new AppError("Unauthorized, you need to be logged in", 401));
-
-  const blacklistKey = `blacklist:${decoded.userId}:${decoded.iat}`;
-  const tokenIsInBlacklist = await redisClient.get(blacklistKey);
-
-  if (tokenIsInBlacklist === token)
-    return next(new AppError("Unauthorized, invalid token"), 401);
 
   req.tokenExp = decoded.exp;
   req.user = user;
