@@ -73,7 +73,7 @@ export const usePostStore = create((set, get) => ({
 
     try {
       const currentPage = isLoadMore ? get().page : 1;
-      const lastPostDate = !isLoadMore && get().posts[0]?.createdAt;
+      const lastPostDate = (!isLoadMore && get().posts[0]?.createdAt) || "";
 
       const res = await axiosInstance.get("/posts", {
         params: {

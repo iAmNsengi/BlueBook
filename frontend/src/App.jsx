@@ -71,10 +71,7 @@ const App = () => {
             path="/auth/reset-password/:token"
             element={authUser ? <Navigate to="/" /> : <ResetPassword />}
           />
-          <Route
-            path="/settings"
-            element={authUser ? <SettingsPage /> : <Navigate to="/login" />}
-          />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route
             path="/profile"
             element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
