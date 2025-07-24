@@ -1,16 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
-import {
-  ArrowBigRight,
-  Eye,
-  EyeClosed,
-  Lock,
-  Mail,
-  MessageSquare,
-  User,
-} from "lucide-react";
+import { ArrowBigRight, Eye, EyeClosed, Lock, User } from "lucide-react";
 import { Link } from "react-router-dom";
-import AuthImagePattern from "../../components/AuthImagePattern";
 import RegexCraft from "regexcraft";
 import toast from "react-hot-toast";
 import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
@@ -65,17 +56,19 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       {/* left side */}
+      <div
+        className="hidden lg:block inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(rgba(17, 63, 103, 0.7), rgba(52, 105, 154, 0.4)), url('https://images.unsplash.com/photo-1639830488367-21141d865f6d?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mjd8fHRlYW0lMjBvciUyMHBlb3BsZSUyMGNoYXR0aW5nJTIwb24lMjBwaG9uZXxlbnwwfHwwfHx8MA%3D%3D')`,
+        }}
+      ></div>
+
+      {/* right side */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
         <div className="w-full max-w-md space-y-8">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="size-6 text-primary animate-pulse" />
-              </div>
               <h1 className="text-2xl font-bold mt-2">Create Account</h1>
-              <p className="text-base-content/60">
-                Create an account to join Vuga community
-              </p>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -103,9 +96,7 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">E-mail</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"></div>
                 <input
                   required
                   type="email"
@@ -122,9 +113,7 @@ const SignUpPage = () => {
                 <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Lock className="size-5 text-base-content/40" />
-                </div>
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"></div>
                 <input
                   required
                   type={showPassword ? "text" : "password"}
@@ -195,12 +184,6 @@ const SignUpPage = () => {
           <GoogleAuth />
         </div>
       </div>
-
-      {/* right side */}
-      <AuthImagePattern
-        title="Join Vuga community now 😎"
-        subtitle="Join to stay connected to your friends and community 👌"
-      />
     </div>
   );
 };
