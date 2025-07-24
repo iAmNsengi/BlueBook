@@ -1,15 +1,7 @@
 import { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
-import {
-  ArrowBigRight,
-  Eye,
-  EyeClosed,
-  Lock,
-  Mail,
-  MessageSquare,
-} from "lucide-react";
+import { ArrowBigRight, Eye, EyeClosed } from "lucide-react";
 import { Link } from "react-router-dom";
-import AuthImagePattern from "../../components/AuthImagePattern";
 import toast from "react-hot-toast";
 import GoogleAuth from "../../components/GoogleAuth/GoogleAuth";
 import SmallLoader from "../../components/Loader/SmallLoader";
@@ -120,19 +112,12 @@ const LoginPage = () => {
         </div>
       </div>
 
-      {/* right side */}
-      {/* <AuthImagePattern
-        title="Welcome back 🤗"
-        subtitle="Stay connected to your friends and community 👌"
-      /> */}
       <div
-        className="inset-0 bg-cover bg-center bg-no-repeat"
+        className="hidden lg:block inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1718804714714-03e882445fcd?q=80&w=986&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
+          backgroundImage: `linear-gradient(rgba(17, 63, 103, 0.7), rgba(52, 105, 154, 0.4)), url('https://images.unsplash.com/photo-1718804714714-03e882445fcd?q=80&w=986&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')`,
         }}
-      >
-        <img src={`/vuga.png`} alt="auth" className="w-full h-full" />
-      </div>
+      ></div>
     </div>
   );
 };
