@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Camera, Loader2, User } from "lucide-react";
+import { Camera, Loader2, Mail, Calendar, Shield } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
@@ -34,131 +34,183 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen h-full pt-20">
-      <div className="max-w-3xl mx-auto p-4 py-8">
-        <div className="bg-base-300/80 rounded-xl p-6 space-y-8">
-          <div className="text-center">
-            <h1 className="text-2xl font-semibold pt-5">
-              My Profile <span className="animate-pulse">🤡</span>
-            </h1>
-            <p className="mt-4">My profile information</p>
-          </div>
-          {/* avatar upload */}
-          <div className="flex flex-col items-center gap-4">
-            <div className="relative">
-              <img
-                src={selectedImage || authUser.profilePic || "/avatar.png"}
-                alt=""
-                className="size-32 rounded-full object-cover border-2"
-              />
-              <label
-                htmlFor="avatar-upload"
-                className={`absolute bottom-0 right-0 bg-base-content hover:scale-105 p-2 rounded-full cursor-pointer duration-200 ${
-                  isUpdatingProfile ? "animate-pulse pointer-events-none" : ""
-                } `}
-              >
-                <Camera className="size-5 text-base-200" />
-                <input
-                  type="file"
-                  id="avatar-upload"
-                  className="hidden"
-                  accept="image/*"
-                  onChange={handleInputChange}
-                  disabled={isUpdatingProfile}
+    <div className="min-h-screen bg-gray-100">
+      {/* Cover Photo Section */}
+      <div className="relative">
+        <div className="h-80 bg-blue-300 relative">
+          <div className="absolute inset-0 bg-black bg-opacity-20"></div>
+        </div>
+
+        {/* Profile Picture and Name Section */}
+        <div className="max-w-5xl mx-auto px-6">
+          <div className="relative -mt-20 pb-6">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end gap-6">
+              {/* Profile Picture */}
+              <div className="relative">
+                <img
+                  src={selectedImage || authUser.profilePic || "/avatar.png"}
+                  alt="Profile"
+                  className="w-40 h-40 rounded-full object-cover border-4 border-white shadow-lg"
                 />
-              </label>
-            </div>
-            <p className="text-sm text-zinc-400">
-              {isUpdatingProfile ? (
-                <div className="flex gap-2">
-                  <Loader2 className="size-5 animate-spin font-bold" />{" "}
-                  Uploading...
-                </div>
-              ) : (
-                <span className="border border-primary rounded-xl px-6 py-1 animate-pulse">
-                  Click the camera icon to update your profile image 🌄
-                </span>
-              )}
-            </p>
-            <div className="space-y-5 py-10 pointer-events-none">
-              <div className="flex items-center justify-between gap-40 space-y-1 5">
-                <div className="text-sm text-zinc-400 flex items-center gap-2">
-                  <User className="size-4" />
-                  Full Name
-                </div>
-                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                  {authUser.fullName}{" "}
-                </p>
-              </div>
-              <div className="flex items-center justify-between gap-3 space-y-1 5">
-                <div className="text-sm text-zinc-400 flex items-center gap-2">
-                  <User className="size-4" />
-                  Email
-                </div>
-                <p className="px-4 py-2.5 bg-base-200 rounded-lg border">
-                  {authUser.email}{" "}
-                </p>
-              </div>
-              <hr />
-
-              <div className="py-6 rounded-xl">
-                <h2 className="text-xl font-medium mb-4">
-                  My account information 🧺
-                </h2>
-                <div className="space-y-3 text-sm">
-                  <div className="flex items-center justify-between py-2 border-b border-zinc-700">
-                    <span>Member since</span>
-                    <span>{authUser.createdAt?.split("T")[0]} </span>
-                  </div>
-                  <div className="flex items-center gap-20 justify-between py-2">
-                    <span>Account Status</span>
-                    <span className="bg-green-500 px-3 py-2 text-white rounded-xl animate-pulse font-bold">
-                      Active{" "}
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="space-y-2 w-full mt-4  px-2">
-              <div className="space-y-3">
-                <h2 className="text-xl font-bold text-red-600">
-                  Delete Account 🚫
-                </h2>
-                <form
-                  className="flex items-end justify-between py-2 border-zinc-700"
-                  onSubmit={deleteMyAccount}
+                <label
+                  htmlFor="avatar-upload"
+                  className={`absolute bottom-2 right-2 bg-white hover:bg-gray-50 p-3 rounded-full cursor-pointer shadow-lg border transition-all duration-200 ${
+                    isUpdatingProfile
+                      ? "animate-pulse pointer-events-none"
+                      : "hover:scale-105"
+                  }`}
                 >
-                  <div className="flex flex-col">
-                    <span className="flex items-center gap-4 py-2">
-                      Type in{" "}
-                      <span className="font-bold">sudo delete account</span> to
-                      remove your account
+                  <Camera className="w-5 h-5 text-gray-600" />
+                  <input
+                    type="file"
+                    id="avatar-upload"
+                    className="hidden"
+                    accept="image/*"
+                    onChange={handleInputChange}
+                    disabled={isUpdatingProfile}
+                  />
+                </label>
+              </div>
+
+              {/* Name and Status */}
+              <div className="text-center sm:text-left mb-4 mt-0 md:mt-20">
+                <h1 className="text-3xl font-black text-blue-800 mb-2 mt-4">
+                  {authUser.fullName}
+                </h1>
+                <p className="text-gray-600 mb-3">
+                  {isUpdatingProfile ? (
+                    <span className="flex items-center gap-2 text-sm">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Updating profile...
                     </span>
-                    <input
-                      className="input"
-                      type="text"
-                      placeholder="sudo delete account"
-                      onChange={(e) =>
-                        e.target.value === "sudo delete account"
-                          ? setEnableDelete(true)
-                          : setEnableDelete(false)
-                      }
-                    />
+                  ) : (
+                    <span className="text-sm bg-green-100 text-green-800 px-3 py-1 rounded-full">
+                      Active
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content Section */}
+      <div className="max-w-5xl mx-auto px-6 pb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - About */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-4 text-gray-900">
+                About
+              </h2>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Mail className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="font-medium text-gray-900">
+                      {authUser.email}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Calendar className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Member since</p>
+                    <p className="font-medium text-gray-900">
+                      {authUser.createdAt?.split("T")[0]}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3">
+                  <Shield className="w-5 h-5 text-gray-500" />
+                  <div>
+                    <p className="text-sm text-gray-500">Account Status</p>
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column - Account Settings */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-lg shadow p-6">
+              <h2 className="text-xl font-semibold mb-6 text-gray-900">
+                Account Settings
+              </h2>
+
+              {/* Profile Update Status */}
+              {!isUpdatingProfile ? (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    Click the camera icon on your profile picture to update your
+                    photo
+                  </p>
+                </div>
+              ) : null}
+
+              {/* Delete Account Section */}
+              <div className="border-t pt-6">
+                <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <h3 className="text-lg font-semibold text-red-800">
+                      Delete Account
+                    </h3>
                   </div>
 
-                  <button
-                    disabled={!enableDelete}
-                    className={`btn bg-red-600 rounded-lg text-white cursor-pointer z-50`}
-                  >
-                    {isDeletingAccount ? (
-                      <>
-                        <Loader2 className="size-5 animate-spin font-bold" />{" "}
-                      </>
-                    ) : (
-                      "Delete Account"
-                    )}
-                  </button>
-                </form>
+                  <p className="text-sm text-red-700 mb-4">
+                    This action cannot be undone. Your account and all
+                    associated data will be permanently deleted.
+                  </p>
+
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-sm font-medium text-red-800 mb-2">
+                        Type{" "}
+                        <span className="font-bold bg-red-100 px-2 py-1 rounded">
+                          sudo delete account
+                        </span>{" "}
+                        to confirm
+                      </label>
+                      <input
+                        type="text"
+                        placeholder="sudo delete account"
+                        className="w-full px-3 py-2 border border-red-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        onChange={(e) =>
+                          e.target.value === "sudo delete account"
+                            ? setEnableDelete(true)
+                            : setEnableDelete(false)
+                        }
+                      />
+                    </div>
+
+                    <button
+                      onClick={deleteMyAccount}
+                      disabled={!enableDelete}
+                      className={`px-4 py-2 rounded-md font-medium transition-all duration-200 ${
+                        enableDelete
+                          ? "bg-red-600 hover:bg-red-700 text-white cursor-pointer"
+                          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                      }`}
+                    >
+                      {isDeletingAccount ? (
+                        <span className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Deleting...
+                        </span>
+                      ) : (
+                        "Delete Account"
+                      )}
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

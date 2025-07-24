@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../../store/useAuthStore";
-import { ArrowBigRight, Loader2, Mail, MessageSquare } from "lucide-react";
-import AuthImagePattern from "../../components/AuthImagePattern";
+import { ArrowBigRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const ForgotPassword = () => {
@@ -20,11 +19,7 @@ const ForgotPassword = () => {
         <div className="w-full max-w-md space-y-8">
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
-              <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                <MessageSquare className="size-6 text-primary animate-pulse" />
-              </div>
               <h1 className="text-2xl font-bold mt-2">Reset your password</h1>
-              <p className="text-base-content/60">Forgot password 😒</p>
             </div>
           </div>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -33,9 +28,6 @@ const ForgotPassword = () => {
                 <span className="label-text font-medium">E-mail</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <Mail className="size-5 text-base-content/40" />
-                </div>
                 <input
                   required
                   type="email"
@@ -74,10 +66,12 @@ const ForgotPassword = () => {
       </div>
 
       {/* right side */}
-      <AuthImagePattern
-        title="😒"
-        subtitle="So sad you can't remember your password 🤦‍♂️"
-      />
+      <div
+        className="hidden lg:block inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `linear-gradient(rgba(17, 63, 103, 0.7), rgba(52, 105, 154, 0.4)), url('https://images.unsplash.com/photo-1697382608786-bcf4c113b86e?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8OHx8Zm9yZ290JTIwcGFzc3dvcmQlMjB1c2VyfGVufDB8fDB8fHww')`,
+        }}
+      ></div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { Suspense, lazy, useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { Toaster } from "react-hot-toast";
 import { useAuthStore } from "./store/useAuthStore";
 import { useThemeStore } from "./store/useThemeStore";
@@ -8,17 +8,15 @@ import Navbar from "./components/Navbar";
 import Loader from "./components/Loader/Loader";
 import "froala-editor/css/froala_style.min.css";
 import "froala-editor/css/froala_editor.pkgd.min.css";
-
-// Lazy load components
-const HomePage = lazy(() => import("./pages/HomePage"));
-const SignUpPage = lazy(() => import("./pages/auth/SignUpPage"));
-const LoginPage = lazy(() => import("./pages/auth/LoginPage"));
-const Chat = lazy(() => import("./pages/chat/Chat"));
-const FindUsers = lazy(() => import("./pages/FindUsers"));
-const SettingsPage = lazy(() => import("./pages/SettingsPage"));
-const ProfilePage = lazy(() => import("./pages/ProfilePage"));
-const ForgotPassword = lazy(() => import("./pages/auth/ForgotPassword"));
-const ResetPassword = lazy(() => import("./pages/auth/ResetPassword"));
+import HomePage from "./pages/HomePage";
+import Chat from "./pages/chat/Chat";
+import FindUsers from "./pages/FindUsers";
+import SignUpPage from "./pages/auth/SignUpPage";
+import LoginPage from "./pages/auth/LoginPage";
+import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
+import SettingsPage from "./pages/SettingsPage";
+import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
@@ -73,10 +71,7 @@ const App = () => {
             path="/auth/reset-password/:token"
             element={authUser ? <Navigate to="/" /> : <ResetPassword />}
           />
-          <Route
-            path="/settings"
-            element={authUser ? <SettingsPage /> : <Navigate to="/login" />}
-          />
+          <Route path="/settings" element={<SettingsPage />} />
           <Route
             path="/profile"
             element={authUser ? <ProfilePage /> : <Navigate to="/login" />}
