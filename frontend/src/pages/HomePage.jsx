@@ -1,15 +1,22 @@
-import Feed from "./feed/Feed";
+import RightSidebar from "./feed/RightSidebar";
+import Sidebar from "./feed/Sidebar";
+import Feed from "../pages/feed/Feed";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen h-full bg-base-200">
-      <div className="flex items-center justify-center pt-20 px-4">
-        <div className="rounded-lg shadow-lg w-full max-w-7xl h-[calc(100vh-8rem]">
-          <div className="h-full rounded-lg overflow-hidden">
+    <div className="min-h-screen bg-gray-100">
+      {/* Main Layout */}
+      <div className="flex pt-16">
+        <Sidebar />
+
+        {/* Main Feed */}
+        <div className="flex-1 lg:ml-64 xl:mr-80">
+          <div className="py-6 px-4">
             <Feed />
           </div>
         </div>
-        {/* User recommendation to follow goes here */}
+
+        <RightSidebar />
       </div>
     </div>
   );
